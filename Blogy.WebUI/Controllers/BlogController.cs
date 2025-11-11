@@ -19,21 +19,46 @@ namespace Blogy.WebUI.Controllers
             return View(values);
         }
 
-        public async Task<IActionResult> GetBlogsByCategory(int id)
+        public async Task<IActionResult> GetBlogsByCategory(int id, int page = 1, int pageSize = 2)
         {
-            var category = await _categoryService.GetByIdAsync(id);
-            ViewBag.categoryName = category.Name;
-            var blogs = await _blogService.GetBlogsByCategoryIdAsync(id);
-            return View(blogs);
+            try
+            {
+                var category = await _categoryService.GetByIdAsync(id);
+                if (category == null)
+                    return NotFound();
+
+                ViewBag.categoryName = category.Name;
+                ViewBag.categoryId = id;
+
+                var blogs = await _blogService.GetBlogsByCategoryIdAsync(id);
+                var pagedBlogs = new PagedList<ResultBlogDto>(
+                    blogs.AsQueryable(),
+                    page,
+                    pageSize
+                );
+
+                return View(pagedBlogs);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", "Blog");
+            }
         }
 
         public async Task<IActionResult> BlogDetails(int id)
         {
-            var blog = await _blogService.GetSingleByIdAsync(id);
-            return View(blog);
+            try
+            {
+                var blog = await _blogService.GetSingleByIdAsync(id);
+                if (blog == null)
+                    return NotFound();
+
+                return View(blog);
+            }
+            catch
+            {
+                return RedirectToAction("Index");
+            }
         }
-
-
-
     }
 }

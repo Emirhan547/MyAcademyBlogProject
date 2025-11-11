@@ -1,11 +1,19 @@
 using Blogy.Business.Extensions;
+using Blogy.Business.Services.AiServices;
+using Blogy.Business.Services.ContactServices;
+using Blogy.Business.Services.DashboardServices;
+using Blogy.Business.Services.ToxicityServices;
 using Blogy.DataAccess.Extensions;
 using Blogy.WebUI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container. 
-
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAiContentService, AiContentService>();
+builder.Services.AddScoped<IToxicityService, ToxicityService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddServicesExt();
 builder.Services.AddRepositoriesExt(builder.Configuration);
 

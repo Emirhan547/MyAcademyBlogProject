@@ -1,6 +1,7 @@
 ﻿using Blogy.Business.DTOs.CommentDtos;
 using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CommentServices;
+using Blogy.Business.Services.ToxicityServices;
 using Blogy.Entity.Entities;
 using Blogy.WebUI.Const;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,7 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
     [Authorize(Roles = Roles.Admin)]
     public class CommentController(ICommentService _commentService,
                                     IBlogService _blogService,
-                                    UserManager<AppUser> _userManager) : Controller
+                                    UserManager<AppUser> _userManager,IToxicityService _toxicityService) : Controller
     {
         private async Task GetBlogs()
         {
@@ -44,12 +45,17 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateComment(CreateCommentDto createCommentDto)
         {
-            await GetBlogs();
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            createCommentDto.UserId = user.Id;
+            // Toksiklik kontrolü
+            var isToxic = await _toxicityService.IsToxicAsync(createCommentDto.Content);
+
+            if (isToxic)
+            {
+                ModelState.AddModelError("", "Yorumunuz uygun olmayan içerik içermektedir.");
+                return View();
+            }
+
             await _commentService.CreateAsync(createCommentDto);
             return RedirectToAction(nameof(Index));
-
         }
     }
 }

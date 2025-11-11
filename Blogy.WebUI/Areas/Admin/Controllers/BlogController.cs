@@ -1,4 +1,5 @@
 ﻿using Blogy.Business.DTOs.BlogDtos;
+using Blogy.Business.Services.AiServices;
 using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CategoryServices;
 using Blogy.Entity.Entities;
@@ -15,7 +16,7 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
     [Authorize(Roles = $"{Roles.Admin}")]
     public class BlogController(IBlogService _blogService,
                                 ICategoryService _categoryService,
-                                UserManager<AppUser> _userManager) : Controller
+                                UserManager<AppUser> _userManager,IAiContentService _aiContentService) : Controller
     {
         private async Task GetCategoriesAsync()
         {
@@ -85,6 +86,20 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateBlogWithAi(string keywords, string prompt)
+        {
+            var generatedContent = await _aiContentService.GenerateArticleAsync(keywords, prompt);
 
+            var blogDto = new CreateBlogDto
+            {
+                Title = keywords,
+                Description = generatedContent,
+                // Diğer alanlar...
+            };
+
+            await _blogService.CreateAsync(blogDto);
+            return RedirectToAction("Index");
+        }
     }
 }
