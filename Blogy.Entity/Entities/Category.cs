@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Blogy.Entity.Entities
 {
-    public class Category:BaseEntity
+    public class Category : BaseEntity
     {
         public string Name { get; set; }
-        public IList<Blog> Blogs { get; set; }
+        public virtual IList<Blog> Blogs { get; set; }
+
+
     }
 }

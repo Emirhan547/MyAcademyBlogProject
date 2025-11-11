@@ -8,8 +8,11 @@ using System.Threading.Tasks;
 
 namespace Blogy.DataAccess.Repositories.BlogRepositories
 {
-    public interface IBlogRepository:IGenericRepository<Blog>
+    public interface IBlogRepository : IGenericRepository<Blog>
     {
         Task<List<Blog>> GetBlogsWithCategoriesAsync();
+
+        Task<List<Blog>> GetLast3BlogsAsync();
+
     }
 }

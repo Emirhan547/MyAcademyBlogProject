@@ -2,20 +2,14 @@
 using Blogy.Business.DTOs.BlogDtos;
 using Blogy.DataAccess.Repositories.BlogRepositories;
 using Blogy.Entity.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blogy.Business.Services.BlogServices
 {
-    public class BlogService(IBlogRepository _blogRepository,IMapper _mapper) : IBlogService
+    public class BlogService(IBlogRepository _blogRepository, IMapper _mapper) : IBlogService
     {
-
-        public async Task CreateAsync(CreateBlogDto createDto)
+        public async Task CreateAsync(CreateBlogDto dto)
         {
-            var entity = _mapper.Map<Blog>(createDto);
+            var entity = _mapper.Map<Blog>(dto);
             await _blogRepository.CreateAsync(entity);
         }
 
@@ -26,28 +20,44 @@ namespace Blogy.Business.Services.BlogServices
 
         public async Task<List<ResultBlogDto>> GetAllAsync()
         {
-            var values =await  _blogRepository.GetAllAsync();
+            var values = await _blogRepository.GetAllAsync();
+            return _mapper.Map<List<ResultBlogDto>>(values);
+        }
+
+        public async Task<List<ResultBlogDto>> GetBlogsByCategoryIdAsync(int categoryId)
+        {
+            var values = await _blogRepository.GetAllAsync(x => x.CategoryId == categoryId);
             return _mapper.Map<List<ResultBlogDto>>(values);
         }
 
         public async Task<List<ResultBlogDto>> GetBlogsWithCategoriesAsync()
         {
-           var values =await _blogRepository.GetBlogsWithCategoriesAsync();
-           return _mapper.Map<List<ResultBlogDto>>(values);
+            var values = await _blogRepository.GetBlogsWithCategoriesAsync();
+            return _mapper.Map<List<ResultBlogDto>>(values);
         }
 
         public async Task<UpdateBlogDto> GetByIdAsync(int id)
         {
-           var value= await _blogRepository.GetByIdAsync(id);
+            var value = await _blogRepository.GetByIdAsync(id);
             return _mapper.Map<UpdateBlogDto>(value);
-
         }
 
-        public async Task UpdateAsync(UpdateBlogDto updateDto)
+        public async Task<List<ResultBlogDto>> GetLast3BlogsAsync()
         {
-            var entity = _mapper.Map<Blog>(updateDto);
-            await _blogRepository.UpdateAsync(entity);
+            var values = await _blogRepository.GetLast3BlogsAsync();
+            return _mapper.Map<List<ResultBlogDto>>(values);
+        }
 
+        public async Task<ResultBlogDto> GetSingleByIdAsync(int id)
+        {
+            var value = await _blogRepository.GetByIdAsync(id);
+            return _mapper.Map<ResultBlogDto>(value);
+        }
+
+        public async Task UpdateAsync(UpdateBlogDto dto)
+        {
+            var entity = _mapper.Map<Blog>(dto);
+            await _blogRepository.UpdateAsync(entity);
         }
     }
 }

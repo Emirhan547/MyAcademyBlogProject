@@ -4,10 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3>Blog Güncelleme Sayfası</h3>
+<h3>Blog Güncelle</h3>
 
 <form method="post">
-    <input type="hidden"asp-for="Id"/>
+
+    <input type="hidden" asp-for="Id" />
     <div class="form-group">
         <label>Blog Başlığı</label>
         <input type="text" asp-for="Title" class="form-control" />
@@ -16,7 +17,7 @@
 
     <div class="form-group">
         <label>Açıklama</label>
-        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+        <textarea type="text" asp-for="Description" class="form-control" rows="6"></textarea>
         <span class="text-danger" asp-validation-for="Description"></span>
     </div>
 
@@ -25,26 +26,24 @@
         <input type="text" asp-for="CoverImage" class="form-control" />
         <span class="text-danger" asp-validation-for="CoverImage"></span>
     </div>
-
     <div class="form-group">
         <label>Blog Resmi 1</label>
-        <input type="text" asp-for="BlogImage" class="form-control" />
-        <span class="text-danger" asp-validation-for="BlogImage"></span>
+        <input type="text" asp-for="BlogImage1" class="form-control" />
+        <span class="text-danger" asp-validation-for="BlogImage1"></span>
     </div>
-
     <div class="form-group">
         <label>Blog Resmi 2</label>
         <input type="text" asp-for="BlogImage2" class="form-control" />
         <span class="text-danger" asp-validation-for="BlogImage2"></span>
     </div>
-
     <div class="form-group">
         <label>Kategori</label>
-        <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.Categories">
-            <option value="">Kategori Seçiniz</option>
+        <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.categories">
+            <option selected>Kategori Seçiniz</option>
         </select>
         <span class="text-danger" asp-validation-for="CategoryId"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-2">Güncelle</button>
+    <button class="btn btn-primary mt-2">Güncelle</button>
+
 </form>

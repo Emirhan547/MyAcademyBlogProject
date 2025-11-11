@@ -21,9 +21,9 @@ namespace Blogy.Business.Services.CategoryServices
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(CreateCategoryDto createCategoryDto)
+        public async Task CreateAsync(CreateCategoryDto categoryDto)
         {
-            var category = _mapper.Map<Category>(createCategoryDto);
+            var category = _mapper.Map<Category>(categoryDto);
             await _categoryRepository.CreateAsync(category);
         }
 
@@ -36,6 +36,7 @@ namespace Blogy.Business.Services.CategoryServices
         {
             var categories = await _categoryRepository.GetAllAsync();
             return _mapper.Map<List<ResultCategoryDto>>(categories);
+
         }
 
         public async Task<UpdateCategoryDto> GetByIdAsync(int id)
@@ -44,9 +45,15 @@ namespace Blogy.Business.Services.CategoryServices
             return _mapper.Map<UpdateCategoryDto>(category);
         }
 
-        public async Task UpdateAsync(UpdateCategoryDto updateCategoryDto)
+        public async Task<List<ResultCategoryDto>> GetCategoriesWithBlogsAsync()
         {
-            var category = _mapper.Map<Category>(updateCategoryDto);
+            var categories = await _categoryRepository.GetCategoriesWithBlogsAsync();
+            return _mapper.Map<List<ResultCategoryDto>>(categories);
+        }
+
+        public async Task UpdateAsync(UpdateCategoryDto categoryDto)
+        {
+            var category = _mapper.Map<Category>(categoryDto);
             await _categoryRepository.UpdateAsync(category);
         }
     }

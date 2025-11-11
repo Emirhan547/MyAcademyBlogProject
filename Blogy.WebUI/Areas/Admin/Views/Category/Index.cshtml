@@ -4,29 +4,38 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+
 <h3>Kategoriler</h3>
 @{
     int count = 0;
+
 }
+
 <table class="table table-bordered table-hover">
     <tr>
         <th>#</th>
         <th>Kategori Adı</th>
         <th>İşlemler</th>
     </tr>
-    @foreach(var item in Model)
+
+    @foreach (var item in Model)
     {
         count++;
         <tr>
-            <td>@count</td>
+            <th>@count</th>
             <td>@item.CategoryName</td>
             <td>
                 <a href="/Admin/Category/DeleteCategory/@item.Id" class="btn btn-danger">Sil</a>
                 <a href="/Admin/Category/UpdateCategory/@item.Id" class="btn btn-info">Güncelle</a>
-
             </td>
         </tr>
     }
 
+
+
+
 </table>
-<a href="/Admin/Category/CreateCategory/" class="btn btn-primary">Yeni Kategori Oluştur</a>
+
+
+<a href="/Admin/Category/CreateCategory" class="btn btn-primary">Yeni Kategori Oluştur</a>
