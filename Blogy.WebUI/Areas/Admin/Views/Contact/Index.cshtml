@@ -1,0 +1,45 @@
+﻿@model List<ContactMessage>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Gelen Mesajlar</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Gönderen</th>
+            <th>Email</th>
+            <th>Konu</th>
+            <th>Tarih</th>
+            <th>Yanıtlandı mı?</th>
+            <th>Detay</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var msg in Model)
+        {
+            <tr>
+                <td>@msg.SenderName</td>
+                <td>@msg.SenderEmail</td>
+                <td>@msg.Subject</td>
+                <td>@msg.CreatedDate.ToShortDateString()</td>
+                <td>
+                    @if (msg.IsReplied)
+                    {
+                        <span class="badge bg-success">Yanıtlandı</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Yanıtlanmadı</span>
+                    }
+                </td>
+                <td>
+                    <a href="/Admin/Contact/Detail/@msg.Id" class="btn btn-primary btn-sm">Gör</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

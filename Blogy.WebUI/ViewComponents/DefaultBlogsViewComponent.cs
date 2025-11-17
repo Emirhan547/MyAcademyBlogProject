@@ -1,9 +1,9 @@
 ﻿using Blogy.Business.Services.CategoryServices;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Blogy.WebUI.ViewComponents.Default_Index
+namespace Blogy.WebUI.ViewComponents
 {
-    public class _DefaultBlogsComponent(ICategoryService _categoryService) : ViewComponent
+    public class DefaultBlogsViewComponent(ICategoryService _categoryService) : ViewComponent
     {
         public async Task<IViewComponentResult> InvokeAsync()
         {

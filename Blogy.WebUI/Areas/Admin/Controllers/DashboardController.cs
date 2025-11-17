@@ -1,45 +1,66 @@
-﻿using Blogy.Business.Services.DashboardServices;
-using Blogy.WebUI.Const;
+﻿using Blogy.Business.Services.BlogServices;
+using Blogy.Business.Services.CategoryServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blogy.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = $"{Roles.Admin}")]
+    [Authorize(Roles = "Admin")]
     public class DashboardController : Controller
     {
-        private readonly IDashboardService _dashboardService;
+        private readonly IBlogService _blogService;
+        private readonly ICategoryService _categoryService;
 
-        public DashboardController(IDashboardService dashboardService)
+        public DashboardController(IBlogService blogService, ICategoryService categoryService)
         {
-            _dashboardService = dashboardService;
+            _blogService = blogService;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var statistics = await _dashboardService.GetStatisticsAsync();
-            return View(statistics);
+            var blogs = await _blogService.GetAllAsync();
+            var categories = await _categoryService.GetAllAsync();
+
+            ViewBag.TotalBlogs = blogs.Count;
+            ViewBag.TotalCategories = categories.Count;
+            ViewBag.TodayBlogs = blogs.Count(x => x.CreatedDate.Date == DateTime.Now.Date);
+
+            return View();
         }
 
-        [HttpGet("api/dashboard/chart-data")]
-        public async Task<IActionResult> GetChartData()
+        // -------------------------------------------------------
+        // Kategorilere göre blog sayısı (Chart.js için JSON)
+        // -------------------------------------------------------
+        [HttpGet]
+        public async Task<IActionResult> GetBlogsByCategory()
         {
-            var statistics = await _dashboardService.GetStatisticsAsync();
+            var categories = await _categoryService.GetCategoriesWithBlogsAsync();
 
-            return Json(new
-            {
-                monthlyData = statistics.MonthlyStats.Select(m => new
-                {
-                    month = m.Month,
-                    count = m.BlogCount
-                }),
-                categoryData = statistics.CategoriesStats.Select(c => new
-                {
-                    name = c.CategoryName,
-                    value = c.BlogCount
-                })
-            });
+            var labels = categories.Select(x => x.CategoryName).ToList();
+            var values = categories.Select(x => x.Blogs.Count).ToList();
+
+            return Json(new { labels, values });
+        }
+
+        // -------------------------------------------------------
+        // Son 7 gün blog eklenme grafiği
+        // -------------------------------------------------------
+        [HttpGet]
+        public async Task<IActionResult> GetBlogsLast7Days()
+        {
+            var blogs = await _blogService.GetAllAsync();
+
+            var dates = Enumerable.Range(0, 7)
+                    .Select(i => DateTime.Now.Date.AddDays(-i))
+                    .OrderBy(d => d)
+                    .ToList();
+
+            var labels = dates.Select(d => d.ToString("dd MMM")).ToList();
+            var values = dates.Select(d => blogs.Count(b => b.CreatedDate.Date == d)).ToList();
+
+            return Json(new { labels, values });
         }
     }
 }

@@ -1,0 +1,67 @@
+﻿@using Blogy.Business.DTOs.BlogDtos
+@model CreateBlogDto
+
+@{
+    ViewData["Title"] = "Yeni Blog Yaz";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<div class="container" style="margin-top:40px; margin-bottom:40px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="card shadow-sm p-4">
+                <h3 class="fw-bold mb-3">Yeni Blog Yaz</h3>
+                <p class="text-muted">Aşağıdaki alanları doldurarak yeni bir blog yazabilirsin.</p>
+
+                <!-- AI İçerik Üretme -->
+                <div class="card bg-light p-3 mb-4 border-0 shadow-sm">
+                    <h5>AI ile Blog İçeriği Oluştur</h5>
+
+                    <form method="post" asp-action="GenerateBlogWithAi">
+
+                        <label class="mt-2">Anahtar Kelimeler</label>
+                        <input name="keywords" class="form-control" placeholder="Örn: yapay zeka, c#, teknoloji" />
+
+                        <label class="mt-3">Açıklama (Prompt)</label>
+                        <textarea name="prompt" rows="3"
+                                  class="form-control"
+                                  placeholder="Yazının nasıl olmasını istediğini yaz..."></textarea>
+
+                        <button class="btn btn-warning mt-3">
+                            <i class="bi bi-lightbulb"></i> AI ile İçerik Üret
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Normal Form -->
+                <form method="post">
+
+                    <label>Başlık</label>
+                    <input asp-for="Title" class="form-control" />
+
+                    <label class="mt-3">Açıklama</label>
+                    <textarea asp-for="Description" rows="6" class="form-control"></textarea>
+
+                    <label class="mt-3">Kapak Görseli</label>
+                    <input asp-for="CoverImage" class="form-control" />
+
+                    <label class="mt-3">Blog Görseli 1</label>
+                    <input asp-for="BlogImage1" class="form-control" />
+
+                    <label class="mt-3">Blog Görseli 2</label>
+                    <input asp-for="BlogImage2" class="form-control" />
+
+                    <label class="mt-3">Kategori</label>
+                    <select asp-for="CategoryId" asp-items="@ViewBag.categories" class="form-control"></select>
+
+                    <button class="btn btn-primary mt-4">
+                        <i class="bi bi-check-circle"></i> Kaydet
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

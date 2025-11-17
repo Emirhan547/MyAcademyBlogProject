@@ -29,6 +29,7 @@ namespace Blogy.WebUI.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -38,8 +39,11 @@ namespace Blogy.WebUI.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Index", "Login");
+            // ✔ OLUŞAN KULLANICIYA USER ROLÜ EKLE
+            await _userManager.AddToRoleAsync(user, "User");
 
+            // ✔ Register sonrası Login sayfasına dönsün
+            return RedirectToAction("Index", "Login");
         }
     }
 }

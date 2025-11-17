@@ -1,0 +1,50 @@
+﻿@using Blogy.Business.DTOs.AboutDtos
+@model CreateAboutDto
+@{
+    ViewData["Title"] = "Yeni About";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3>Yeni About Oluştur</h3>
+
+<form method="post">
+    <div class="form-group">
+        <label>İçerik</label>
+
+        <!-- Textarea -->
+        <textarea asp-for="Content" id="aboutContent" class="form-control" rows="6"></textarea>
+    </div>
+
+    <br />
+
+    <!-- AI OLUŞTUR BUTONU -->
+    <button type="button" id="aiGenerateBtn" class="btn btn-warning">
+        <i class="fa fa-robot"></i> AI Önerisi Oluştur
+    </button>
+
+    <button class="btn btn-primary">Kaydet</button>
+</form>
+
+
+@section Scripts {
+    <script>
+        $("#aiGenerateBtn").click(function () {
+
+            $("#aiGenerateBtn").prop("disabled", true).text("AI üretiyor...");
+
+            $.ajax({
+                url: "/Admin/About/GenerateAiAbout",
+                type: "POST",
+                success: function (data) {
+                    $("#aboutContent").val(data);  // AI çıktısını textarea’ya yaz
+                    $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
+                },
+                error: function () {
+                    alert("AI içerik oluşturulamadı! API anahtarı eksik olabilir.");
+                    $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
+                }
+            });
+
+        });
+    </script>
+}

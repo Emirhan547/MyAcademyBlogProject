@@ -1,30 +1,46 @@
 ﻿@model LoginDto
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/UILayout/Index.cshtml";
+    ViewData["Title"] = "Giriş Yap";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
 }
 
-<div class="container">
-    <h3>Kullanıcı Girişi</h3>
+<div class="full_container">
+    <div class="container">
+        <div class="center verticle_center full_height">
 
-    <form method="post">
-        <div class="form-group">
-            <label>Kullanıcı Adınız</label>
-            <input type="text" class="form-control" asp-for="UserName" required />
+            <div class="login_section">
+                <div class="logo_login">
+                    <div class="center">
+                        <img width="210" src="~/pluto-1.0.0/images/logo/logo.png" alt="logo" />
+                    </div>
+                </div>
+
+                <div class="login_form">
+                    <form method="post" asp-action="Index" asp-controller="Login">
+                        <fieldset>
+                            <div class="field">
+                                <label class="label_field">Kullanıcı Adı</label>
+                                <input asp-for="UserName" class="form-control" placeholder="Kullanıcı adı" />
+                            </div>
+
+                            <div class="field">
+                                <label class="label_field">Şifre</label>
+                                <input asp-for="Password" class="form-control" type="password" placeholder="Şifre" />
+                            </div>
+
+                            <div class="field margin_0">
+                                <span class="text-danger">@Html.ValidationSummary()</span>
+                            </div>
+
+                            <div class="field margin_0 mt-3">
+                                <button class="main_bt">Giriş Yap</button>
+                            </div>
+
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+
         </div>
-
-        <div class="form-group">
-            <label>Şifre</label>
-            <input type="password" class="form-control" asp-for="Password" required />
-        </div>
-
-        <br />
-        <span class="text-danger">@Html.ValidationSummary()</span>
-
-        <button class="btn btn-outline-primary">Giriş Yap</button>
-
-    </form>
+    </div>
 </div>
-
-
-

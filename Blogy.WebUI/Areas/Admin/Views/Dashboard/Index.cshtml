@@ -1,0 +1,119 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row column_title">
+    <div class="col-md-12">
+        <div class="page_title">
+            <h2>Dashboard</h2>
+        </div>
+    </div>
+</div>
+
+<!-- İstatistik Kartları -->
+<div class="row column1">
+    <div class="col-md-6 col-lg-3">
+        <div class="full counter_section margin_bottom_30">
+            <div class="couter_icon">
+                <i class="fa fa-book yellow_color"></i>
+            </div>
+            <div class="counter_no">
+                <p class="total_no">@ViewBag.TotalBlogs</p>
+                <p class="head_couter">Toplam Blog</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="full counter_section margin_bottom_30">
+            <div class="couter_icon">
+                <i class="fa fa-list blue1_color"></i>
+            </div>
+            <div class="counter_no">
+                <p class="total_no">@ViewBag.TotalCategories</p>
+                <p class="head_couter">Kategori Sayısı</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="full counter_section margin_bottom_30">
+            <div class="couter_icon">
+                <i class="fa fa-clock-o green_color"></i>
+            </div>
+            <div class="counter_no">
+                <p class="total_no">@ViewBag.TodayBlogs</p>
+                <p class="head_couter">Bugün Eklenen Blog</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafikler -->
+<div class="row column2 margin_bottom_30">
+    <div class="col-md-6 col-lg-6">
+        <div class="white_shd full">
+            <div class="full graph_head">
+                <h2>Kategorilere Göre Blog Sayısı</h2>
+            </div>
+            <div class="full graph_revenue">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+        <div class="white_shd full">
+            <div class="full graph_head">
+                <h2>Son 7 Gün Blog Grafiği</h2>
+            </div>
+            <div class="full graph_revenue">
+                <canvas id="last7daysChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // -----------------------------
+        // Kategorilere göre blog sayısı
+        // -----------------------------
+        fetch("/Admin/Dashboard/GetBlogsByCategory")
+            .then(res => res.json())
+            .then(data => {
+                new Chart(document.getElementById("categoryChart"), {
+                    type: "bar",
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: "Blog Sayısı",
+                            backgroundColor: "#ffcc00",
+                            data: data.values
+                        }]
+                    }
+                })
+            });
+
+        // -----------------------------
+        // Son 7 gün grafiği
+        // -----------------------------
+        fetch("/Admin/Dashboard/GetBlogsLast7Days")
+            .then(res => res.json())
+            .then(data => {
+                new Chart(document.getElementById("last7daysChart"), {
+                    type: "line",
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: "Blog",
+                            borderColor: "#007bff",
+                            fill: false,
+                            data: data.values
+                        }]
+                    }
+                })
+            });
+    </script>
+}

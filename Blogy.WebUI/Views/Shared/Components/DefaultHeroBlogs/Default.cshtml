@@ -1,0 +1,52 @@
+﻿@model List<ResultBlogDto>
+
+<section class="section bg-light">
+    <div class="container">
+        <div class="row align-items-stretch retro-layout">
+            @* Sol sütun *@
+            <div class="col-md-4">
+                @foreach (var blog in Model.Take(2))
+                {
+                    <a href="/Blog/Detail/@blog.Id" class="h-entry mb-30 v-height gradient">
+                        <div class="featured-img" style="background-image: url('@blog.CoverImage');"></div>
+                        <div class="text">
+                            <span class="date">@blog.CreatedDate.ToShortDateString()</span>
+                            <h2>@blog.Title</h2>
+                        </div>
+                    </a>
+                }
+            </div>
+
+            @* Orta sütun *@
+            <div class="col-md-4">
+                @{
+                    var middleBlog = Model.Skip(2).FirstOrDefault() ?? Model.FirstOrDefault();
+                }
+                @if (middleBlog is not null)
+                {
+                    <a href="/Blog/Detail/@middleBlog.Id" class="h-entry img-5 h-100 gradient">
+                        <div class="featured-img" style="background-image: url('@middleBlog.CoverImage');"></div>
+                        <div class="text">
+                            <span class="date">@middleBlog.CreatedDate.ToShortDateString()</span>
+                            <h2>@middleBlog.Title</h2>
+                        </div>
+                    </a>
+                }
+            </div>
+
+            @* Sağ sütun *@
+            <div class="col-md-4">
+                @foreach (var blog in Model.Skip(3).Take(2))
+                {
+                    <a href="/Blog/Detail/@blog.Id" class="h-entry mb-30 v-height gradient">
+                        <div class="featured-img" style="background-image: url('@blog.CoverImage');"></div>
+                        <div class="text">
+                            <span class="date">@blog.CreatedDate.ToShortDateString()</span>
+                            <h2>@blog.Title</h2>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

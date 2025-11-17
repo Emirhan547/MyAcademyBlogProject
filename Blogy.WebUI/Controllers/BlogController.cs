@@ -1,64 +1,100 @@
-﻿using AutoMapper;
-using Blogy.Business.DTOs.BlogDtos;
+﻿using Blogy.Business.DTOs.BlogDtos;
+using Blogy.Business.DTOs.CategoryDtos;
+using Blogy.Business.DTOs.CommentDtos;
 using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CategoryServices;
+using Blogy.Business.Services.CommentServices;
+using Blogy.Business.Services.ToxicityServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PagedList.Core;
+using System.Security.Claims;
 
 namespace Blogy.WebUI.Controllers
 {
-    public class BlogController(IBlogService _blogService, ICategoryService _categoryService, IMapper _mapper) : Controller
+    public class BlogController : Controller
     {
+        private readonly IBlogService _blogService;
+        private readonly ICategoryService _categoryService;
+        private readonly ICommentService _commentService;
+        private readonly IToxicityService _toxicityService;
 
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 2)
+        public BlogController(
+            IBlogService blogService,
+            ICategoryService categoryService,
+            ICommentService commentService,
+            IToxicityService toxicityService)
+        {
+            _blogService = blogService;
+            _categoryService = categoryService;
+            _commentService = commentService;
+            _toxicityService = toxicityService;
+        }
+
+        // ----------------------------------------------------------
+        // TÜM BLOG LİSTESİ
+        // ----------------------------------------------------------
+        public async Task<IActionResult> Index()
         {
             var blogs = await _blogService.GetAllAsync();
-
-            var values = new PagedList<ResultBlogDto>(blogs.AsQueryable(), page, pageSize);
-
-            return View(values);
+            return View(blogs);
         }
 
-        public async Task<IActionResult> GetBlogsByCategory(int id, int page = 1, int pageSize = 2)
+        // ----------------------------------------------------------
+        // KATEGORİYE GÖRE BLOG LİSTESİ
+        // ----------------------------------------------------------
+        public async Task<IActionResult> GetBlogsByCategory(int id)
         {
-            try
-            {
-                var category = await _categoryService.GetByIdAsync(id);
-                if (category == null)
-                    return NotFound();
+            var categories = await _categoryService.GetAllAsync();
+            var category = categories.FirstOrDefault(x => x.Id == id);
 
-                ViewBag.categoryName = category.Name;
-                ViewBag.categoryId = id;
+            if (category == null)
+                return NotFound();
 
-                var blogs = await _blogService.GetBlogsByCategoryIdAsync(id);
-                var pagedBlogs = new PagedList<ResultBlogDto>(
-                    blogs.AsQueryable(),
-                    page,
-                    pageSize
-                );
+            ViewBag.CategoryName = category.CategoryName;
 
-                return View(pagedBlogs);
-            }
-            catch (Exception ex)
-            {
-                return RedirectToAction("Index", "Blog");
-            }
+            var blogs = await _blogService.GetBlogsByCategoryIdAsync(id);
+            return View(blogs);
         }
 
-        public async Task<IActionResult> BlogDetails(int id)
+        // ----------------------------------------------------------
+        // BLOG DETAY
+        // ----------------------------------------------------------
+        public async Task<IActionResult> Detail(int id)
         {
-            try
-            {
-                var blog = await _blogService.GetSingleByIdAsync(id);
-                if (blog == null)
-                    return NotFound();
+            var blog = await _blogService.GetSingleByIdAsync(id);
 
-                return View(blog);
-            }
-            catch
-            {
-                return RedirectToAction("Index");
-            }
+            if (blog == null)
+                return NotFound();
+
+            return View(blog);
         }
+
+        // ----------------------------------------------------------
+        // YORUM EKLEME (AI Toxicity dahil)
+        // ----------------------------------------------------------
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddComment(CreateCommentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return Redirect("/Blog/Detail/" + dto.BlogId);
+
+            // Toxicity hesapla
+            var toxicity = await _toxicityService.CheckToxicityAsync(dto.Content);
+            dto.IsToxic = toxicity > 0.5m; // DTO’ya yazıyoruz
+
+            // UserId INT → Claim'ten alıyoruz
+            var userIdString = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            dto.UserId = int.Parse(userIdString);
+
+            // CreatedDate DTO içinde olduğundan burada ekliyoruz
+            dto.CreatedDate = DateTime.Now;
+
+            // Artık tek parametreli CreateAsync çalışır
+            await _commentService.CreateAsync(dto);
+
+            return Redirect("/Blog/Detail/" + dto.BlogId);
+        }
+
     }
 }

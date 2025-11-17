@@ -1,0 +1,182 @@
+﻿@model ResultBlogDto
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<!-- ÜST KAPAK ALANI -->
+<div class="site-cover site-cover-sm same-height overlay single-page" style="background-image: url('@Model.CoverImage');">
+    <div class="container">
+        <div class="row same-height justify-content-center">
+            <div class="col-md-6">
+                <div class="post-entry text-center">
+                    <h1 class="mb-4">@Model.Title</h1>
+                    <div class="post-meta align-items-center text-center">
+
+                        <figure class="author-figure mb-0 me-3 d-inline-block">
+                            <img src="@Model.Writer.ImageUrl" alt="Image" class="img-fluid">
+                        </figure>
+
+                        <span class="d-inline-block mt-1">
+                            By @Model.Writer.FullName
+                        </span>
+
+                        <span>&nbsp;-&nbsp; @Model.CreatedDate.ToShortDateString()</span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ANA İÇERİK -->
+<section class="section">
+    <div class="container">
+
+        <div class="row blog-entries element-animate">
+
+            <!-- SOL ANA BLOK -->
+            <div class="col-md-12 col-lg-8 main-content">
+
+                <!-- BLOG GÖVDE -->
+                <div class="post-content-body">
+
+                    <div class="row my-4">
+                        <div class="col-md-12 mb-4">
+                            <img src="@Model.CoverImage" alt="Image placeholder" class="img-fluid rounded">
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.BlogImage1))
+                        {
+                            <div class="col-md-6 mb-4">
+                                <img src="@Model.BlogImage1" alt="Image placeholder" class="img-fluid rounded">
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.BlogImage2))
+                        {
+                            <div class="col-md-6 mb-4">
+                                <img src="@Model.BlogImage2" alt="Image placeholder" class="img-fluid rounded">
+                            </div>
+                        }
+                    </div>
+
+                    <p>@Model.Description</p>
+
+                </div>
+
+                <!-- CATEGORY DETAIL -->
+                <div class="pt-5">
+                    <p>
+                        Kategori:
+                        <a href="#">
+                            @Model.Category.CategoryName
+                        </a>
+                    </p>
+                </div>
+
+
+                <!-- TAGS -->
+                <div class="sidebar-box">
+                    <h3 class="heading">Etiketler</h3>
+                    <ul class="tags">
+                        @foreach (var tag in Model.BlogTags)
+                        {
+                            <li><a href="#">@tag.Tag.Name</a></li>
+                        }
+                    </ul>
+                </div>
+
+
+                <!-- YORUMLAR -->
+                <div class="pt-5 comment-wrap">
+                    <h3 class="mb-5 heading">@Model.Comments.Count Yorum</h3>
+
+                    <ul class="comment-list">
+
+                        @foreach (var comment in Model.Comments)
+                        {
+                            <li class="comment">
+                                <div class="vcard">
+                                    <img src="@comment.User.ImageUrl" alt="Image placeholder">
+                                </div>
+                                <div class="comment-body">
+
+                                    <!-- Toxic Badge -->
+                                    @if (comment.IsToxic)
+                                    {
+                                        <span class="badge bg-danger mb-2">Toxic Comment</span>
+                                    }
+
+                                    <h3>@comment.User.FullName</h3>
+                                    <div class="meta">@comment.CreatedDate.ToShortDateString()</div>
+                                    <p>@comment.Content</p>
+
+                                </div>
+                            </li>
+                        }
+
+                    </ul>
+
+
+                    <!-- YORUM EKLEME FORMU -->
+                    <div class="comment-form-wrap pt-5">
+                        <h3 class="mb-5">Yorum Yap</h3>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form method="post" asp-action="AddComment" asp-controller="Blog" class="p-5 bg-light">
+                                <input type="hidden" name="BlogId" value="@Model.Id" />
+
+                                <div class="form-group mb-3">
+                                    <label>Yorumunuz</label>
+                                    <textarea name="Content" class="form-control" rows="5" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="submit" value="Gönder" class="btn btn-primary">
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                Yorum yapmak için
+                                <a href="/Login/Index">giriş yapmanız</a> gerekiyor.
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SAĞ SİDEBAR -->
+            <div class="col-md-12 col-lg-4 sidebar">
+
+                <!-- Search (İstersek kapatırız) -->
+                <div class="sidebar-box search-form-wrap">
+                    <form class="sidebar-search-form">
+                        <span class="bi-search"></span>
+                        <input type="text" class="form-control" placeholder="Ara...">
+                    </form>
+                </div>
+
+                <!-- Son Eklenen Bloglar -->
+                @await Component.InvokeAsync("BlogsByCategoryLatestBlogs")
+
+                <hr />
+
+                <!-- Kategoriler -->
+                @await Component.InvokeAsync("CategoryListSidebar")
+
+            </div>
+
+        </div>
+
+    </div>
+</section>

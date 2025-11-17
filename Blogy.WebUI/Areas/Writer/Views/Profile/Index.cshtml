@@ -1,0 +1,29 @@
+﻿@using Blogy.Business.DTOs.UserDtos
+@model EditProfileDto
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<h2>Profilim</h2>
+
+<form method="post">
+
+    <label>Ad</label>
+    <input asp-for="FirstName" class="form-control" /><br />
+
+    <label>Soyad</label>
+    <input asp-for="LastName" class="form-control" /><br />
+
+    <label>Email</label>
+    <input asp-for="Email" class="form-control" /><br />
+
+    <label>Telefon</label>
+    <input asp-for="PhoneNumber" class="form-control" /><br />
+
+    <label>Ünvan</label>
+    <input asp-for="Title" class="form-control" /><br />
+
+    <button class="btn btn-primary">Güncelle</button>
+
+</form>

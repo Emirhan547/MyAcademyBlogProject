@@ -1,0 +1,18 @@
+﻿@using Blogy.Entity.Entities
+@model ContactMessage
+@{
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<section class="section">
+    <div class="container">
+        <h2>Mesajınız Alındı</h2>
+
+        <p><strong>Tespit Edilen Dil:</strong> @Model.DetectedLanguage</p>
+
+        <div class="alert alert-info mt-3">
+            <strong>Otomatik Yanıt:</strong><br />
+            @Model.AutoReply
+        </div>
+    </div>
+</section>

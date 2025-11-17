@@ -1,0 +1,33 @@
+﻿@using Blogy.Business.DTOs.AboutDtos
+@model List<ResultAboutDto>
+@{
+    ViewData["Title"] = "About Listesi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>About İçerikleri</h2>
+
+<a href="/Admin/About/Create" class="btn btn-success mb-3">Yeni About Oluştur</a>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>#</th>
+        <th>Content</th>
+        <th>İşlemler</th>
+    </tr>
+    @{
+        int count = 0;
+    }
+    @foreach (var item in Model)
+    {
+        count++;
+        <tr>
+            <td>@count</td>
+            <td>@(item.Content.Length > 80 ? item.Content.Substring(0, 80) + "..." : item.Content)</td>
+            <td>
+                <a href="/Admin/About/Update/@item.Id" class="btn btn-info btn-sm">Güncelle</a>
+                <a href="/Admin/About/Delete/@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Silinsin mi?')">Sil</a>
+            </td>
+        </tr>
+    }
+</table>

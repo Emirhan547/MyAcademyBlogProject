@@ -18,6 +18,6 @@ namespace Blogy.Business.DTOs.CommentDtos
         public int UserId { get; set; }
         public ResultUserDto User { get; set; }
         public DateTime CreatedDate { get; set; }
-
+        public bool IsToxic { get; set; }
     }
 }
