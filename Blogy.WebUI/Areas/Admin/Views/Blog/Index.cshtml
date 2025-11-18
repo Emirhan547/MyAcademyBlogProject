@@ -51,7 +51,7 @@
                                                 @item.Title
                                             </td>
                                             <td>@(item.Description?.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
-                                            <td>@item.Category.CategoryName</td>
+                                            <td>@item.Category.Name</td>
                                             <td>
                                                 <a href="/Admin/Blog/UpdateBlog/@item.Id" class="btn btn-sm btn-info">Güncelle</a>
                                                 <a href="/Admin/Blog/DeleteBlog/@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinizden emin misiniz?')">Sil</a>

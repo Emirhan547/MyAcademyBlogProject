@@ -1,23 +1,23 @@
 ﻿using Blogy.Business.Services.AboutServices;
 using Blogy.Business.DTOs.AboutDtos;
-using Blogy.Business.Services.AiServices;   // <-- EKLE
+using Blogy.Business.Services.AiServices;
 using Blogy.WebUI.Const;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blogy.WebUI.Areas.Admin.Controllers
 {
-    [Area(Roles.Admin)]
-    [Authorize(Roles = $"{Roles.Admin}")]
+    [Area("Admin")]  
+    [Authorize(Roles = "Admin")]
     public class AboutController : Controller
     {
         private readonly IAboutService _aboutService;
-        private readonly IAiContentService _aiService;   // <-- EKLE
+        private readonly IAiContentService _aiService;
 
         public AboutController(IAboutService aboutService, IAiContentService aiService)
         {
             _aboutService = aboutService;
-            _aiService = aiService;  // <-- EKLE
+            _aiService = aiService;
         }
 
         public async Task<IActionResult> Index()
@@ -64,7 +64,6 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
         public async Task<IActionResult> GenerateAiAbout()
         {
             var aboutText = await _aiService.GenerateAboutTextAsync();
-
             return Json(aboutText);
         }
     }

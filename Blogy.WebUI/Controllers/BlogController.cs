@@ -50,7 +50,7 @@ namespace Blogy.WebUI.Controllers
             if (category == null)
                 return NotFound();
 
-            ViewBag.CategoryName = category.CategoryName;
+            ViewBag.CategoryName = category.Name;
 
             var blogs = await _blogService.GetBlogsByCategoryIdAsync(id);
             return View(blogs);

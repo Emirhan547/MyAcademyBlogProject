@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Blogy.Business.DTOs.AiDtos;
 using Blogy.Business.DTOs.BlogDtos;
 using Blogy.Business.Services.AiServices;
 using Blogy.Business.Services.BlogServices;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using PagedList.Core;
+using System.Text.Json;
 
 namespace Blogy.WebUI.Areas.Writer.Controllers
 {
@@ -32,42 +35,42 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             _aiService = aiService;
         }
 
-        private async Task LoadCategories()
+        private async Task GetCategoriesAsync()
         {
             var categories = await _categoryService.GetAllAsync();
             ViewBag.categories = categories
-                .Select(x => new SelectListItem
+                .Select(c => new SelectListItem
                 {
-                    Text = x.CategoryName,
-                    Value = x.Id.ToString()
+                    Text = c.Name,
+                    Value = c.Id.ToString()
                 }).ToList();
         }
 
-        // Writer kendi bloglarını görür
-        public async Task<IActionResult> Index()
+
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
             var blogs = await _blogService.GetAllAsync();
             blogs = blogs.Where(x => x.WriterId == user.Id).ToList();
 
-            return View(blogs);
+            var pagedBlogs = new PagedList<ResultBlogDto>(blogs.AsQueryable(), page, pageSize);
+            return View(pagedBlogs);
         }
 
-        // CREATE GET
+
         public async Task<IActionResult> Create()
         {
-            await LoadCategories();
-            return View();
+            await GetCategoriesAsync();
+            return View(new CreateBlogDto());
         }
 
-        // CREATE POST
         [HttpPost]
         public async Task<IActionResult> Create(CreateBlogDto dto)
         {
             if (!ModelState.IsValid)
             {
-                await LoadCategories();
+                await GetCategoriesAsync();
                 return View(dto);
             }
 
@@ -78,57 +81,29 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             return RedirectToAction("Index");
         }
 
-        // AI ile blog oluşturma
         [HttpPost]
         public async Task<IActionResult> GenerateBlogWithAi(string keywords, string prompt)
         {
-            await LoadCategories();
+            var jsonString = await _aiService.GenerateBlogJsonAsync(keywords, prompt);
 
-            var aiText = await _aiService.GenerateArticleAsync(keywords, prompt);
-
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-
-            var dto = new CreateBlogDto
+            try
             {
-                Title = keywords,
-                Description = aiText,
-                CategoryId = 0,
-                WriterId = user.Id
-            };
+                var data = JsonSerializer.Deserialize<AiBlogJson>(jsonString);
 
-            return View("Create", dto);
-        }
+                if (data == null)
+                    return Json(new { error = "AI JSON boş döndü." });
 
-        // UPDATE GET
-        public async Task<IActionResult> Update(int id)
-        {
-            await LoadCategories();
-            var blog = await _blogService.GetByIdAsync(id);
-            return View(blog);
-        }
-
-        // UPDATE POST
-        [HttpPost]
-        public async Task<IActionResult> Update(UpdateBlogDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                await LoadCategories();
-                return View(dto);
+                return Json(data);
             }
-
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            dto.WriterId = user.Id;
-
-            await _blogService.UpdateAsync(dto);
-            return RedirectToAction("Index");
-        }
-
-        // DELETE
-        public async Task<IActionResult> Delete(int id)
-        {
-            await _blogService.DeleteAsync(id);
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    error = "JSON parse hatası",
+                    detail = ex.Message,
+                    raw = jsonString
+                });
+            }
         }
     }
 }

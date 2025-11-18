@@ -37,7 +37,7 @@
                             <img src="@item.CoverImage" alt="Image" class="img-fluid">
                         </a>
                         <div>
-                            <span class="date">@item.CreatedDate &bullet; <a href="#">@item.Category.CategoryName</a></span>
+                            <span class="date">@item.CreatedDate &bullet; <a href="#">@item.Category.Name</a></span>
                             <h2><a href="single.html">@item.Title</a></h2>
                             <p>@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</p>
                             <p><a href="/Blog/BlogDetails/@item.Id" class="btn btn-sm btn-outline-primary">Devamını Oku</a></p>

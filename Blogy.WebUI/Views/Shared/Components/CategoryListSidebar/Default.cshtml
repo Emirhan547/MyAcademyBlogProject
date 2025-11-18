@@ -6,8 +6,9 @@
         @foreach (var category in Model)
         {
             <li>
-                <a href="/Blog/Category/@category.Id">
-                    @category.CategoryName
+                <a href="/Blog/GetBlogsByCategory/@category.Id">
+                    @category.Name
+                    <span>(@category.Blogs.Count)</span>
                 </a>
             </li>
         }

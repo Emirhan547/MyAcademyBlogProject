@@ -16,5 +16,7 @@ namespace Blogy.Business.Services.BlogServices
         Task<List<ResultBlogDto>> GetBlogsByCategoryIdAsync(int categoryId);
 
         Task<List<ResultBlogDto>> GetLast3BlogsAsync();
+
+
     }
 }

@@ -10,7 +10,7 @@ namespace Blogy.Business.DTOs.CategoryDtos
 {
     public class ResultCategoryDto:BaseDto
     {
-        public string CategoryName { get; set; }
+        public string Name { get; set; }
         public IList<ResultBlogDto> Blogs { get; set; }
     }
 }

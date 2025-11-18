@@ -67,7 +67,7 @@ public class BlogController : Controller
         ViewBag.categories = categories
             .Select(c => new SelectListItem
             {
-                Text = c.CategoryName,
+                Text = c.Name,
                 Value = c.Id.ToString()
             }).ToList();
     }

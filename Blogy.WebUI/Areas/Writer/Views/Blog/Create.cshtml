@@ -1,4 +1,5 @@
-﻿@using Blogy.Business.DTOs.BlogDtos
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using Blogy.Business.DTOs.BlogDtos
 @model CreateBlogDto
 
 @{
@@ -6,42 +7,36 @@
     Layout = "~/Views/UILayout/Index.cshtml";
 }
 
-<div class="container" style="margin-top:40px; margin-bottom:40px;">
+<div class="container mt-4 mb-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
             <div class="card shadow-sm p-4">
+
                 <h3 class="fw-bold mb-3">Yeni Blog Yaz</h3>
                 <p class="text-muted">Aşağıdaki alanları doldurarak yeni bir blog yazabilirsin.</p>
 
-                <!-- AI İçerik Üretme -->
                 <div class="card bg-light p-3 mb-4 border-0 shadow-sm">
                     <h5>AI ile Blog İçeriği Oluştur</h5>
 
-                    <form method="post" asp-action="GenerateBlogWithAi">
+                    <label class="mt-2">Anahtar Kelimeler</label>
+                    <input id="aiKeywords" class="form-control" placeholder="Örn: yazılım, teknoloji" />
 
-                        <label class="mt-2">Anahtar Kelimeler</label>
-                        <input name="keywords" class="form-control" placeholder="Örn: yapay zeka, c#, teknoloji" />
+                    <label class="mt-3">Açıklama (Prompt)</label>
+                    <textarea id="aiPrompt" class="form-control" rows="3"></textarea>
 
-                        <label class="mt-3">Açıklama (Prompt)</label>
-                        <textarea name="prompt" rows="3"
-                                  class="form-control"
-                                  placeholder="Yazının nasıl olmasını istediğini yaz..."></textarea>
+                    <button id="btnGenerateAi" class="btn btn-warning mt-3">AI ile İçerik Üret</button>
 
-                        <button class="btn btn-warning mt-3">
-                            <i class="bi bi-lightbulb"></i> AI ile İçerik Üret
-                        </button>
-                    </form>
+                    <div id="aiLoader" class="mt-2 text-muted" style="display:none;">AI üretiyor...</div>
                 </div>
 
-                <!-- Normal Form -->
                 <form method="post">
 
                     <label>Başlık</label>
-                    <input asp-for="Title" class="form-control" />
+                    <input asp-for="Title" id="Title" class="form-control" />
 
                     <label class="mt-3">Açıklama</label>
-                    <textarea asp-for="Description" rows="6" class="form-control"></textarea>
+                    <textarea asp-for="Description" id="DescriptionArea" class="form-control" rows="6"></textarea>
 
                     <label class="mt-3">Kapak Görseli</label>
                     <input asp-for="CoverImage" class="form-control" />
@@ -52,12 +47,16 @@
                     <label class="mt-3">Blog Görseli 2</label>
                     <input asp-for="BlogImage2" class="form-control" />
 
-                    <label class="mt-3">Kategori</label>
-                    <select asp-for="CategoryId" asp-items="@ViewBag.categories" class="form-control"></select>
+                    <label>Kategori</label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.categories">
+                        <option selected>Kategori Seçiniz</option>
+                    </select>
+                    <span class="text-danger" asp-validation-for="CategoryId"></span>
 
-                    <button class="btn btn-primary mt-4">
-                        <i class="bi bi-check-circle"></i> Kaydet
-                    </button>
+
+
+                    <button class="btn btn-primary mt-4">Kaydet</button>
+
                 </form>
 
             </div>
@@ -65,3 +64,49 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $("#btnGenerateAi").click(function () {
+
+            let keywords = $("#aiKeywords").val();
+            let prompt = $("#aiPrompt").val();
+
+            if (!keywords) return alert("Lütfen anahtar kelime girin!");
+
+            $("#btnGenerateAi").prop("disabled", true).text("AI üretiyor...");
+            $("#aiLoader").show();
+
+            $.ajax({
+                url: "/Writer/Blog/GenerateBlogWithAi",
+                type: "POST",
+                data: { keywords, prompt },
+
+                success: function (data) {
+
+                    if (data.error) {
+                        alert("AI HATASI: " + data.error);
+                        return;
+                    }
+
+                    // SADE HAL: sadece başlık ve açıklama
+                    $("#Title").val(data.title);
+                    $("#DescriptionArea").val(data.description);
+
+                    $("#btnGenerateAi").prop("disabled", false).text("AI ile İçerik Üret");
+                    $("#aiLoader").hide();
+                },
+
+                error: function () {
+                    alert("AI içerik oluşturulamadı!");
+                    $("#btnGenerateAi").prop("disabled", false).text("AI ile İçerik Üret");
+                    $("#aiLoader").hide();
+                }
+            });
+
+        });
+    </script>
+}
+

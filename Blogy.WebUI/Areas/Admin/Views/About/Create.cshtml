@@ -11,13 +11,11 @@
     <div class="form-group">
         <label>İçerik</label>
 
-        <!-- Textarea -->
         <textarea asp-for="Content" id="aboutContent" class="form-control" rows="6"></textarea>
     </div>
 
     <br />
 
-    <!-- AI OLUŞTUR BUTONU -->
     <button type="button" id="aiGenerateBtn" class="btn btn-warning">
         <i class="fa fa-robot"></i> AI Önerisi Oluştur
     </button>
@@ -25,8 +23,10 @@
     <button class="btn btn-primary">Kaydet</button>
 </form>
 
-
 @section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         $("#aiGenerateBtn").click(function () {
 
@@ -36,15 +36,26 @@
                 url: "/Admin/About/GenerateAiAbout",
                 type: "POST",
                 success: function (data) {
-                    $("#aboutContent").val(data);  // AI çıktısını textarea’ya yaz
+
+                    console.log("AI RESPONSE:", data);
+
+                    $("#aboutContent").val(data);
+
                     $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
                 },
-                error: function () {
-                    alert("AI içerik oluşturulamadı! API anahtarı eksik olabilir.");
+                error: function (xhr) {
+
+                    console.log("AJAX ERROR:", xhr);
+
+                    let msg = xhr.responseText ? xhr.responseText : "AI içerik oluşturulamadı!";
+                    alert(msg);
+
                     $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
                 }
             });
 
         });
     </script>
+
 }
+

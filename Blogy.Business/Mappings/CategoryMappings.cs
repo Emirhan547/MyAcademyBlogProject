@@ -10,9 +10,9 @@ namespace Blogy.Business.Mappings
         {
 
             //source=> kaynak destination=> hedef
-            CreateMap<Category, ResultCategoryDto>()
-                        .ForMember(dst => dst.CategoryName,
-                        o => o.MapFrom(src => src.Name));
+            CreateMap<Category, ResultCategoryDto>().ReverseMap();
+     
+
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
         }

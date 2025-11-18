@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Blogy.Business.DTOs.BlogDtos;
+using Blogy.Business.DTOs.CategoryDtos;
 using Blogy.DataAccess.Repositories.BlogRepositories;
 using Blogy.Entity.Entities;
 
@@ -23,6 +24,7 @@ namespace Blogy.Business.Services.BlogServices
             var values = await _blogRepository.GetAllAsync();
             return _mapper.Map<List<ResultBlogDto>>(values);
         }
+
 
         public async Task<List<ResultBlogDto>> GetBlogsByCategoryIdAsync(int categoryId)
         {

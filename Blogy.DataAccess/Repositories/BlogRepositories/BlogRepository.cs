@@ -11,6 +11,7 @@ namespace Blogy.DataAccess.Repositories.BlogRepositories
         {
         }
 
+
         public async Task<List<Blog>> GetBlogsWithCategoriesAsync()
         {
             return await _table.Include(x => x.Category).ToListAsync();

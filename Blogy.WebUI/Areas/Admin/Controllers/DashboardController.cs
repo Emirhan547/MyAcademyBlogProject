@@ -38,7 +38,7 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
         {
             var categories = await _categoryService.GetCategoriesWithBlogsAsync();
 
-            var labels = categories.Select(x => x.CategoryName).ToList();
+            var labels = categories.Select(x => x.Name).ToList();
             var values = categories.Select(x => x.Blogs.Count).ToList();
 
             return Json(new { labels, values });
