@@ -48,10 +48,11 @@
                     <input asp-for="BlogImage2" class="form-control" />
 
                     <label>Kategori</label>
-                    <select asp-for="CategoryId" class="form-control" asp-items="@ViewBag.categories">
-                        <option selected>Kategori Seçiniz</option>
+                    <select asp-for="CategoryId" class="form-control" asp-items="Model.Categories">
+                        <option value="">Kategori Seçiniz</option>
                     </select>
                     <span class="text-danger" asp-validation-for="CategoryId"></span>
+
 
 
 

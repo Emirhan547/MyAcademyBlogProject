@@ -8,7 +8,7 @@
             <li>
                 <a href="/Blog/GetBlogsByCategory/@category.Id">
                     @category.Name
-                    <span>(@category.Blogs.Count)</span>
+                    <span>(@(category.Blogs?.Count ?? 0))</span>
                 </a>
             </li>
         }

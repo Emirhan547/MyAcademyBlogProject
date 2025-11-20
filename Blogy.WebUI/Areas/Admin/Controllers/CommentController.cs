@@ -13,22 +13,36 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
 {
     [Area(Roles.Admin)]
     [Authorize(Roles = Roles.Admin)]
-    public class CommentController(ICommentService _commentService,
-                                    IBlogService _blogService,
-                                    UserManager<AppUser> _userManager,IToxicityService _toxicityService) : Controller
+    public class CommentController : Controller
     {
+        private readonly ICommentService _commentService;
+        private readonly IBlogService _blogService;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IToxicityService _toxicityService;
+
+        public CommentController(
+            ICommentService commentService,
+            IBlogService blogService,
+            UserManager<AppUser> userManager,
+            IToxicityService toxicityService)
+        {
+            _commentService = commentService;
+            _blogService = blogService;
+            _userManager = userManager;
+            _toxicityService = toxicityService;
+        }
+
         private async Task GetBlogs()
         {
             var blogs = await _blogService.GetAllAsync();
-            TempData["blogs"] = (from blog in blogs
-                                 select new SelectListItem
-                                 {
-                                     Text = blog.Title,
-                                     Value = blog.Id.ToString()
-                                 }).ToList();
+            TempData["blogs"] = blogs
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Title,
+                    Value = x.Id.ToString()
+                })
+                .ToList();
         }
-
-
 
         public async Task<IActionResult> Index()
         {
@@ -43,19 +57,25 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateComment(CreateCommentDto createCommentDto)
+        public async Task<IActionResult> CreateComment(CreateCommentDto dto)
         {
-            // Toksiklik kontrolü
-            var isToxic = await _toxicityService.IsToxicAsync(createCommentDto.Content);
+            var isToxic = await _toxicityService.IsToxicAsync(dto.Content);
 
             if (isToxic)
             {
-                ModelState.AddModelError("", "Yorumunuz uygun olmayan içerik içermektedir.");
-                return View();
+                ModelState.AddModelError("", "Yorum toksik içerik içeriyor.");
+                await GetBlogs();
+                return View(dto);
             }
 
-            await _commentService.CreateAsync(createCommentDto);
+            await _commentService.CreateAsync(dto);
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            await _commentService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

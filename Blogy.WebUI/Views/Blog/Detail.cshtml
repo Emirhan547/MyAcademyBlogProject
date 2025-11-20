@@ -72,7 +72,7 @@
                     <p>
                         Kategori:
                         <a href="#">
-                            @Model.Category.Name    
+                            @Model.Category.Name
                         </a>
                     </p>
                 </div>
@@ -124,6 +124,21 @@
                     <!-- YORUM EKLEME FORMU -->
                     <div class="comment-form-wrap pt-5">
                         <h3 class="mb-5">Yorum Yap</h3>
+
+                        <!-- TOXICITY UYARI MESAJLARI -->
+                        @if (TempData["CommentError"] != null)
+                        {
+                            <div class="alert alert-danger">
+                                @TempData["CommentError"]
+                            </div>
+                        }
+
+                        @if (TempData["CommentSuccess"] != null)
+                        {
+                            <div class="alert alert-success">
+                                @TempData["CommentSuccess"]
+                            </div>
+                        }
 
                         @if (User.Identity.IsAuthenticated)
                         {

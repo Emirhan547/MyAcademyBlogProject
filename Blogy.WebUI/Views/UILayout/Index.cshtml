@@ -45,10 +45,12 @@
             <div class="site-navigation" style="padding: 5px 0;">
                 <div class="row g-0 align-items-center" style="min-height:60px;">
 
+                    <!-- Logo -->
                     <div class="col-2">
                         <a href="/Default/Index" class="logo m-0">Blogy<span class="text-primary">.</span></a>
                     </div>
 
+                    <!-- Menü -->
                     <div class="col-8 text-center">
                         <ul class="js-clone-nav d-none d-lg-inline-block site-menu mx-auto" style="margin:0;">
                             <li class="@(Context.Request.Path.Value?.StartsWith("/Default") == true ? "active" : "")">
@@ -58,7 +60,8 @@
                             <li><a href="/Contact/Index">İletişim</a></li>
                             <li><a href="/About/Index">Hakkımızda</a></li>
 
-                            @if (User.Identity?.IsAuthenticated ?? false && User.IsInRole("Writer"))
+                            <!-- SADECE WRITER -->
+                            @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Writer"))
                             {
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
@@ -74,16 +77,19 @@
 
                     </div>
 
+                    <!-- Sağ Üst Kullanıcı Alanı -->
                     <div class="col-2 text-end">
-                        @if (User.Identity?.IsAuthenticated ?? false)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <span class="small me-2">@User.Identity.Name</span>
 
+                            <!-- SADECE USER -->
                             @if (User.IsInRole("User"))
                             {
                                 <a href="/User/Home/Index" class="btn btn-sm btn-outline-light me-1">Profilim</a>
                             }
 
+                            <!-- SADECE WRITER -->
                             @if (User.IsInRole("Writer"))
                             {
                                 <a href="/Writer/Blog/Index" class="btn btn-sm btn-outline-light me-1">Yazar Paneli</a>
@@ -106,6 +112,7 @@
 
     @RenderBody()
 
+    <!-- FOOTER -->
     <footer class="site-footer" style="padding-top:25px; padding-bottom:15px;">
         <div class="container">
 
@@ -164,7 +171,6 @@
     <script src="~/blogy-1.0.0/js/counter.js"></script>
     <script src="~/blogy-1.0.0/js/custom.js"></script>
 
-    <!-- 🟩 EKLENEN KISIM -->
     @RenderSection("Scripts", required: false)
 
 </body>

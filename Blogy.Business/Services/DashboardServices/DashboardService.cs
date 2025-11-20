@@ -2,28 +2,28 @@
 using Blogy.DataAccess.Repositories.BlogRepositories;
 using Blogy.DataAccess.Repositories.CategoryRepositories;
 using Blogy.DataAccess.Repositories.CommentRepositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Blogy.Entity.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Blogy.Business.Services.DashboardServices
 {
-   
     public class DashboardService : IDashboardService
     {
         private readonly IBlogRepository _blogRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICommentRepository _commentRepository;
+        private readonly UserManager<AppUser> _userManager;
 
-        public DashboardService(IBlogRepository blogRepository,
+        public DashboardService(
+            IBlogRepository blogRepository,
             ICategoryRepository categoryRepository,
-            ICommentRepository commentRepository)
+            ICommentRepository commentRepository,
+            UserManager<AppUser> userManager)
         {
             _blogRepository = blogRepository;
             _categoryRepository = categoryRepository;
             _commentRepository = commentRepository;
+            _userManager = userManager;
         }
 
         public async Task<DashboardStatisticsDto> GetStatisticsAsync()
@@ -31,6 +31,9 @@ namespace Blogy.Business.Services.DashboardServices
             var blogs = await _blogRepository.GetAllAsync();
             var categories = await _categoryRepository.GetAllAsync();
             var comments = await _commentRepository.GetAllAsync();
+
+            // ✅ USER SAYISI DÜZELTİLDİ
+            var totalUsers = _userManager.Users.Count();
 
             var categoryStats = categories.Select(c => new CategoryStatisticsDto
             {
@@ -53,7 +56,7 @@ namespace Blogy.Business.Services.DashboardServices
                 TotalBlogs = blogs.Count,
                 TotalCategories = categories.Count,
                 TotalComments = comments.Count,
-                TotalUsers = 0, // UserManager'dan çekilecek
+                TotalUsers = totalUsers, // ✅ DÜZELTİLDİ
                 AvgCommentsPerBlog = blogs.Count > 0
                     ? (decimal)comments.Count / blogs.Count
                     : 0,

@@ -5,8 +5,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Blogy.WebUI.Controllers
 {
-    public class LoginController(SignInManager<AppUser> _signInManager, UserManager<AppUser> _userManager) : Controller
+    public class LoginController : Controller
     {
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+
+        public LoginController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -26,16 +35,28 @@ namespace Blogy.WebUI.Controllers
                 return View(model);
             }
 
-            // GİRİŞ YAPAN USER'ı BUL
             var user = await _userManager.FindByNameAsync(model.UserName);
 
-            // ADMIN Mİ?
+            // ADMIN İSE
             if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
                 return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
             }
 
-            // USER İSE FRONTEND’E GİTSİN
+            // WRITER İSE
+            if (await _userManager.IsInRoleAsync(user, "Writer"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Writer" });
+            }
+
+            // USER İSE
+            return RedirectToAction("Index", "Home", new { area = "User" });
+        }
+
+        // ✅ LOGOUT EKLENDİ
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Default");
         }
     }

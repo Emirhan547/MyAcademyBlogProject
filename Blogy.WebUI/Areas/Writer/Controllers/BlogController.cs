@@ -35,18 +35,6 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             _aiService = aiService;
         }
 
-        private async Task GetCategoriesAsync()
-        {
-            var categories = await _categoryService.GetAllAsync();
-            ViewBag.categories = categories
-                .Select(c => new SelectListItem
-                {
-                    Text = c.Name,
-                    Value = c.Id.ToString()
-                }).ToList();
-        }
-
-
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -61,16 +49,34 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
 
         public async Task<IActionResult> Create()
         {
-            await GetCategoriesAsync();
-            return View(new CreateBlogDto());
+            var categories = await _categoryService.GetAllAsync();
+
+            var dto = new CreateBlogDto();
+            dto.Categories = categories
+                .Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                })
+                .ToList();
+
+            return View(dto);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateBlogDto dto)
         {
             if (!ModelState.IsValid)
             {
-                await GetCategoriesAsync();
+                // ModelState bozulduğunda kategorileri tekrar doldurmalısın
+                var categories = await _categoryService.GetAllAsync();
+                dto.Categories = categories.Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                }).ToList();
+
                 return View(dto);
             }
 
@@ -80,6 +86,7 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             await _blogService.CreateAsync(dto);
             return RedirectToAction("Index");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> GenerateBlogWithAi(string keywords, string prompt)
@@ -91,9 +98,19 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
                 var data = JsonSerializer.Deserialize<AiBlogJson>(jsonString);
 
                 if (data == null)
-                    return Json(new { error = "AI JSON boş döndü." });
+                {
+                    return Json(new
+                    {
+                        error = "AI JSON parse edilemedi",
+                        raw = jsonString
+                    });
+                }
 
-                return Json(data);
+                return Json(new
+                {
+                    title = data.Title,
+                    description = data.Description
+                });
             }
             catch (Exception ex)
             {
@@ -105,5 +122,6 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
                 });
             }
         }
+
     }
 }

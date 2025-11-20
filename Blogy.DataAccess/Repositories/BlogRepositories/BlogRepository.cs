@@ -14,7 +14,19 @@ namespace Blogy.DataAccess.Repositories.BlogRepositories
 
         public async Task<List<Blog>> GetBlogsWithCategoriesAsync()
         {
-            return await _table.Include(x => x.Category).ToListAsync();
+            return await _table
+               .AsNoTracking()
+               .Include(x => x.Category)
+               .ToListAsync();
+        }
+
+        public async Task<List<Blog>> GetBlogsByCategoryIdWithCategoryAsync(int categoryId)
+        {
+            return await _table
+                .AsNoTracking()
+                .Where(x => x.CategoryId == categoryId)
+                .Include(x => x.Category)
+                .ToListAsync();
         }
 
         public async Task<List<Blog>> GetLast3BlogsAsync()

@@ -38,51 +38,63 @@ namespace Blogy.Business.Services.AiServices
                 model = "gpt-4o-mini",
                 messages = new[]
                 {
-                    new
-                    {
-                        role = "system",
-                        content =
-@"Sadece şu formatta GEÇERLİ bir JSON üret:
+            new
+            {
+                role = "system",
+                content =
+@"Kesinlikle ve sadece şu formatta geçerli bir JSON üret:
 
 {
-  ""title"": ""Başlık"",
-  ""description"": ""Blog açıklaması""
+  ""Title"": ""Blog Başlığı"",
+  ""Description"": ""Blog yazısı (tam olarak 1000 karakter, ne eksik ne fazla)""
 }
 
-Başka hiçbir açıklama, metin, yorum veya işaret ekleme.
-Sadece JSON döndür."
-                    },
-                    new
-                    {
-                        role = "user",
-                        content = $"Konu: {keywords}\nDetay: {prompt}"
-                    }
-                },
-                max_tokens = 800,
-                temperature = 0.4
+Açıklama kısmı düz metin olmalı.  
+Tam olarak 1000 karakter üret.  
+Karakter sayısı boşluklar dahil olacak.  
+JSON dışında asla başka açıklama ekleme."
+            },
+            new
+            {
+                role = "user",
+                content = $"Konu: {keywords}\nDetay: {prompt}\n\n1000 karakterlik blog yazısı üret."
+            }
+        },
+                temperature = 0.4,
+                max_tokens = 2000
             };
 
-            var response = await client.PostAsJsonAsync("https://api.openai.com/v1/chat/completions", request);
+            var response = await client.PostAsJsonAsync(
+                "https://api.openai.com/v1/chat/completions", request);
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            try
-            {
-                var parsed = JsonSerializer.Deserialize<JsonElement>(jsonResponse);
+            var parsed = JsonDocument.Parse(jsonResponse);
 
-                return parsed.GetProperty("choices")[0]
-                             .GetProperty("message")
-                             .GetProperty("content")
-                             .GetString() ?? "";
-            }
-            catch
+            string content = null;
+
+            // 1) message.content
+            if (parsed.RootElement
+                .GetProperty("choices")[0]
+                .TryGetProperty("message", out var msg)
+                && msg.TryGetProperty("content", out var msgContent))
             {
-                return "";
+                content = msgContent.GetString();
             }
+
+            // 2) delta.content (streaming modellerde)
+            if (content == null &&
+                parsed.RootElement
+                    .GetProperty("choices")[0]
+                    .TryGetProperty("delta", out var delta)
+                    && delta.TryGetProperty("content", out var deltaContent))
+            {
+                content = deltaContent.GetString();
+            }
+
+            return content ?? jsonResponse;
         }
 
-        // -------------------------------------------------------
-        // ABOUT (istersen yine AI üzerinden üret)
-        // -------------------------------------------------------
         public async Task<string> GenerateAboutTextAsync()
         {
             return await GenerateBlogJsonAsync("Blogy", "300 karakterlik about yazısı üret.") ?? "";
@@ -95,23 +107,43 @@ Sadece JSON döndür."
         {
             try
             {
-                var client = _httpClientFactory.CreateClient();
+                var client = CreateClient();
 
-                var content = new StringContent($"text={Uri.EscapeDataString(text)}",
-                    Encoding.UTF8, "application/x-www-form-urlencoded");
-
-                var response = await client.PostAsync("https://ws.detectlanguage.com/0.2/detect", content);
-                response.EnsureSuccessStatusCode();
-
-                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-
-                if (json.TryGetProperty("detections", out var detections) &&
-                    detections.GetArrayLength() > 0)
+                var request = new
                 {
-                    return detections[0].GetProperty("language").GetString() ?? "en";
+                    model = "gpt-4o-mini",
+                    messages = new[]
+                    {
+                new
+                {
+                    role = "system",
+                    content = "Detect the language of the user text. Respond ONLY with the ISO code such as: tr, en, fr, de, ar, es."
+                },
+                new
+                {
+                    role = "user",
+                    content = text
                 }
+            },
+                    temperature = 0
+                };
 
-                return "en";
+                var response = await client.PostAsJsonAsync(
+                    "https://api.openai.com/v1/chat/completions",
+                    request);
+
+                var json = await response.Content.ReadAsStringAsync();
+                var parsed = JsonSerializer.Deserialize<JsonElement>(json);
+
+                var lang = parsed
+                    .GetProperty("choices")[0]
+                    .GetProperty("message")
+                    .GetProperty("content")
+                    .GetString()
+                    ?.Trim()
+                    ?.ToLower();
+
+                return lang ?? "en";
             }
             catch
             {
@@ -119,9 +151,6 @@ Sadece JSON döndür."
             }
         }
 
-        // -------------------------------------------------------
-        // TRANSLATE
-        // -------------------------------------------------------
         public async Task<string> TranslateToEnglishAsync(string text, string sourceLanguage)
         {
             if (sourceLanguage == "en")

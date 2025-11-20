@@ -1,0 +1,53 @@
+﻿
+@model ResultAboutDto
+@{
+    ViewData["Title"] = "Hakkımızda";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<section class="section bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 text-center">
+                <span class="caption">Bizi Tanıyın</span>
+                <h1 class="mb-3">Hakkımızda</h1>
+                <p class="lead text-muted">Blogy topluluğu, bilgi paylaşımını ve kaliteli içerikleri herkes için erişilebilir kılmak amacıyla kuruldu.</p>
+            </div>
+        </div>
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-8">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
+                    @if (Model != null && !string.IsNullOrWhiteSpace(Model.Content))
+                    {
+                        <div class="about-content">
+                            @Html.Raw(Model.Content)
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0 text-muted">Hakkımızda bilgisi henüz eklenmedi. Çok yakında detayları paylaşacağız.</p>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="p-4 bg-white shadow-sm rounded-3 mb-4">
+                    <h4>Misyonumuz</h4>
+                    <p class="text-muted mb-0">Yazarlar ve okuyucular için güvenli, üretken ve ilham verici bir alan oluşturmak.</p>
+                </div>
+                <div class="p-4 bg-white shadow-sm rounded-3 mb-4">
+                    <h4>Vizyonumuz</h4>
+                    <p class="text-muted mb-0">Yapay zekâ destekli içerik üretimiyle bilgi paylaşımında yeni standartlar belirlemek.</p>
+                </div>
+                <div class="p-4 bg-white shadow-sm rounded-3">
+                    <h4>Topluluk İlkeleri</h4>
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>Toksik içeriğe karşı sıfır tolerans</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>Yazar ve kullanıcı ayrımıyla güvenli alanlar</li>
+                        <li><i class="bi bi-check2-circle text-primary me-2"></i>AI destekli üretkenlik ve doğruluk</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

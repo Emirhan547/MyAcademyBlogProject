@@ -7,6 +7,7 @@ using Blogy.Business.Services.CommentServices;
 using Blogy.Business.Services.ToxicityServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PagedList.Core;
 using System.Security.Claims;
 
 namespace Blogy.WebUI.Controllers
@@ -33,10 +34,11 @@ namespace Blogy.WebUI.Controllers
         // ----------------------------------------------------------
         // TÜM BLOG LİSTESİ
         // ----------------------------------------------------------
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 6)
         {
-            var blogs = await _blogService.GetAllAsync();
-            return View(blogs);
+            var blogs = await _blogService.GetBlogsWithCategoriesAsync();
+            var pagedBlogs = new PagedList<ResultBlogDto>(blogs.AsQueryable(), page, pageSize);
+            return View(pagedBlogs);
         }
 
         // ----------------------------------------------------------
@@ -68,31 +70,40 @@ namespace Blogy.WebUI.Controllers
 
             return View(blog);
         }
-
-        // ----------------------------------------------------------
-        // YORUM EKLEME (AI Toxicity dahil)
-        // ----------------------------------------------------------
-        [Authorize]
+        [Authorize(Roles = "User,Writer")]
         [HttpPost]
         public async Task<IActionResult> AddComment(CreateCommentDto dto)
         {
             if (!ModelState.IsValid)
                 return Redirect("/Blog/Detail/" + dto.BlogId);
 
-            // Toxicity hesapla
-            var toxicity = await _toxicityService.CheckToxicityAsync(dto.Content);
-            dto.IsToxic = toxicity > 0.5m; // DTO’ya yazıyoruz
+            // 1) Toksiklik skorunu al
+            var score = await _toxicityService.CheckToxicityAsync(dto.Content);
 
-            // UserId INT → Claim'ten alıyoruz
-            var userIdString = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-            dto.UserId = int.Parse(userIdString);
+            // 2) Eşik üstüyse KAYDETME, kullanıcıyı uyar
+            if (score > 0.50m)
+            {
+                TempData["CommentError"] =
+                    $"Yorumunuz toksik olarak algılandı (oran: {score:F2}). " +
+                    "Lütfen daha uygun bir dil kullanın.";
 
-            // CreatedDate DTO içinde olduğundan burada ekliyoruz
+                return Redirect("/Blog/Detail/" + dto.BlogId);
+            }
+
+            // 3) Buraya gelmişse toksik değildir → IsToxic = false
+            dto.IsToxic = false;
+
+            // 4) UserId’yi claim’den al
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            dto.UserId = int.Parse(userIdString!);
+
+            // 5) CreatedDate DTO’da varsa doldur
             dto.CreatedDate = DateTime.Now;
 
-            // Artık tek parametreli CreateAsync çalışır
+            // 6) Yorumu kaydet
             await _commentService.CreateAsync(dto);
 
+            TempData["CommentSuccess"] = "Yorumunuz başarıyla kaydedildi.";
             return Redirect("/Blog/Detail/" + dto.BlogId);
         }
 
