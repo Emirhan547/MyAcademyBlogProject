@@ -1,53 +1,51 @@
-﻿using Blogy.Business.Services.AiServices;
+﻿using AutoMapper;
+using Blogy.Business.DTOs.ContactDtos;
 using Blogy.DataAccess.Repositories.ContactRepositories;
+using Blogy.Business.Services.AiServices;
 using Blogy.Entity.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blogy.Business.Services.ContactServices
 {
     public class ContactService : IContactService
     {
         private readonly IContactRepository _contactRepository;
-        private readonly IAiContentService _aiContentService;
+        private readonly IAiContentService _aiService;
+        private readonly IMapper _mapper;
 
-        public ContactService(IContactRepository contactRepository,
-            IAiContentService aiContentService)
+        public ContactService(IContactRepository contactRepository, IAiContentService aiService, IMapper mapper)
         {
             _contactRepository = contactRepository;
-            _aiContentService = aiContentService;
+            _aiService = aiService;
+            _mapper = mapper;
         }
 
-        public async Task<int> SendMessageAsync(ContactMessage message)
+        public async Task<int> SendMessageAsync(CreateContactMessageDto dto)
         {
-            // Dili tespit et
-            var language = await _aiContentService.DetectLanguageAsync(message.Message);
-            message.DetectedLanguage = language;
+            var entity = _mapper.Map<ContactMessage>(dto);
 
-            // Otomatik yanıt oluştur
-            var autoReply = await _aiContentService.GenerateAutoReplyAsync(
-                message.Message,
-                language
-            );
-            message.AutoReply = autoReply;
-            message.IsReplied = true;
-            message.RepliedDate = DateTime.Now;
+            // AI işlemleri
+            entity.DetectedLanguage = await _aiService.DetectLanguageAsync(dto.Message);
+            entity.AutoReply = await _aiService.GenerateAutoReplyAsync(dto.Message, entity.DetectedLanguage);
 
-            await _contactRepository.CreateAsync(message);
-            return message.Id;
+            entity.IsReplied = true;
+            entity.RepliedDate = DateTime.Now;
+            entity.CreatedDate = DateTime.Now;
+
+            await _contactRepository.CreateAsync(entity);
+
+            return entity.Id;
         }
 
-        public async Task<List<ContactMessage>> GetAllMessagesAsync()
+        public async Task<List<ResultContactMessageDto>> GetAllMessagesAsync()
         {
-            return await _contactRepository.GetAllAsync();
+            var data = await _contactRepository.GetAllAsync();
+            return _mapper.Map<List<ResultContactMessageDto>>(data);
         }
 
-        public async Task<ContactMessage> GetMessageByIdAsync(int id)
+        public async Task<GetContactMessageDetailDto> GetMessageByIdAsync(int id)
         {
-            return await _contactRepository.GetByIdAsync(id);
+            var entity = await _contactRepository.GetByIdAsync(id);
+            return _mapper.Map<GetContactMessageDetailDto>(entity);
         }
     }
 }

@@ -11,8 +11,7 @@ namespace Blogy.Business.Mappings
 
             //source=> kaynak destination=> hedef
             CreateMap<Category, ResultCategoryDto>().ReverseMap();
-     
-
+    
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
         }

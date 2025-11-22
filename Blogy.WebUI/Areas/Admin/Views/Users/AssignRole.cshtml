@@ -1,25 +1,64 @@
 ﻿@model List<AssignRoleDto>
 @{
-    ViewData["Title"] = "AssignRole";
+    ViewData["Title"] = "Rol Atama";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>Rol Atama Sayfası</h3>
-<h5>@ViewBag.fullName kullanıcısına rol atama yapabilirsiiz.</h5>
-<form method="post">
+<div class="midde_cont">
+    <div class="container-fluid">
 
-    @for (int i = 0; i < Model.Count; i++)
-    {
-        <div class="form-check">
-            <input type="hidden" asp-for="@Model[i].RoleId" />
-            <input type="hidden" asp-for="@Model[i].RoleName" />
-            <input type="hidden" asp-for="@Model[i].UserId" />
-            <input type="checkbox" asp-for="@Model[i].RoleExists" class="form-check-input" />
-            <label class="form-check-label">@Model[i].RoleName</label>
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Rol Atama</h2>
+                </div>
+            </div>
         </div>
-    }
-    <br />
-    <button class="btn btn-outline-primary">Rol Ata</button>
 
+        <!-- Kart -->
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="white_shd full margin_bottom_30">
 
-</form>
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>@ViewBag.fullName kullanıcısına rol atama</h3>
+                        </div>
+                    </div>
+
+                    <div class="full padding_infor_info">
+
+                        <form method="post">
+
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                <div class="form-check mb-2">
+                                    <input type="hidden" asp-for="@Model[i].RoleId" />
+                                    <input type="hidden" asp-for="@Model[i].RoleName" />
+                                    <input type="hidden" asp-for="@Model[i].UserId" />
+
+                                    <input type="checkbox"
+                                           asp-for="@Model[i].RoleExists"
+                                           class="form-check-input" />
+
+                                    <label class="form-check-label">
+                                        @Model[i].RoleName
+                                    </label>
+                                </div>
+                            }
+
+                            <button class="btn btn-primary mt-3 px-4">
+                                <i class="fa fa-save"></i> Kaydet
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

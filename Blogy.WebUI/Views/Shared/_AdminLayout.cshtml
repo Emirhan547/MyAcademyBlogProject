@@ -1,5 +1,11 @@
-﻿@{
+﻿
+@inject UserManager<Blogy.Entity.Entities.AppUser> UserManager
+
+@{
     Layout = null;
+
+    var currentUser = await UserManager.FindByNameAsync(User.Identity.Name);
+    var profileImage = currentUser?.ImageUrl ?? "/images/default.png";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -48,22 +54,28 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- USER SIDEBAR INFO -->
                     <div class="sidebar_user_info">
                         <div class="icon_setting"></div>
                         <div class="user_profle_side">
                             <div class="user_img">
-                                <img class="img-responsive" src="~/pluto-1.0.0/images/layout_img/user_img.jpg" alt="user" />
+                                <img class="img-responsive rounded-circle" src="@profileImage"
+                                     style="height:60px;width:60px;object-fit:cover;" />
                             </div>
                             <div class="user_info">
-                                <h6>@User.Identity?.Name ?? "Admin"</h6>
+                                <h6>@currentUser.FirstName @currentUser.LastName</h6>
                                 <p><span class="online_animation"></span> Online</p>
                             </div>
                         </div>
                     </div>
+
                 </div>
+
                 <div class="sidebar_blog_2">
                     <h4>General</h4>
                     <ul class="list-unstyled components">
+
                         <li>
                             <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="active">
                                 <i class="fa fa-dashboard yellow_color"></i> <span>Dashboard</span>
@@ -87,6 +99,7 @@
                                 <i class="fa fa-comments yellow_color"></i> <span>Yorumlar</span>
                             </a>
                         </li>
+
                         <li>
                             <a asp-area="Admin" asp-controller="About" asp-action="Index">
                                 <i class="fa fa-info-circle blue1_color"></i> <span>Hakkımızda</span>
@@ -95,26 +108,35 @@
 
                         <li>
                             <a asp-area="Admin" asp-controller="Role" asp-action="Index">
-                                <i class="fa fa-comments yellow_color"></i> <span>Rol Atama</span>
+                                <i class="fa fa-user-shield yellow_color"></i> <span>Rol Atama</span>
                             </a>
                         </li>
+
                         <li>
                             <a asp-area="Admin" asp-controller="Users" asp-action="Index">
-                                <i class="fa fa-comments yellow_color"></i> <span>Kullanıcılar</span>
+                                <i class="fa fa-users blue1_color"></i> <span>Kullanıcılar</span>
                             </a>
                         </li>
+
+                        <li>
+                            <a asp-area="Admin" asp-controller="Contact" asp-action="Index">
+                                <i class="fa fa-envelope red_color"></i> <span>İletişim</span>
+                            </a>
+                        </li>
+
                         <li>
                             <a asp-controller="Login" asp-action="Index">
                                 <i class="fa fa-sign-out red_color"></i> <span>Çıkış Yap</span>
                             </a>
                         </li>
-                    </ul>
 
+                    </ul>
                 </div>
             </nav>
             <!-- End Sidebar -->
             <!-- Right Content -->
             <div id="content">
+
                 <!-- Topbar -->
                 <div class="topbar">
                     <nav class="navbar navbar-expand-lg navbar-light">
@@ -127,41 +149,43 @@
                                     <img class="img-responsive" src="~/pluto-1.0.0/images/logo/logo.png" alt="logo" />
                                 </a>
                             </div>
+
                             <div class="right_topbar">
-                                <div class="icon_info">
-                                    <ul>
-                                        <li><a href="#"><i class="fa fa-bell-o"></i><span class="badge">2</span></a></li>
-                                        <li><a href="#"><i class="fa fa-question-circle"></i></a></li>
-                                        <li><a href="#"><i class="fa fa-envelope-o"></i><span class="badge">3</span></a></li>
-                                    </ul>
+                                <div class="icon_info">                      
+                                    <!-- TOPBAR USER -->
                                     <ul class="user_profile_dd">
                                         <li>
                                             <a class="dropdown-toggle" data-toggle="dropdown">
-                                                <img class="img-responsive rounded-circle" src="~/pluto-1.0.0/images/layout_img/user_img.jpg" alt="user" />
-                                                <span class="name_user">@User.Identity?.Name ?? "Admin"</span>
+                                                <img class="img-responsive rounded-circle" src="@profileImage"
+                                                     style="height:40px;width:40px;object-fit:cover;" />
+                                                <span class="name_user">@currentUser.FirstName @currentUser.LastName</span>
                                             </a>
+
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="Profile">My Profile</a>
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="Settings">Settings</a>
-                                                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                                <a class="dropdown-item" asp-area="Admin" asp-controller="Profile" asp-action="Index">
+                                                    My Profile
+                                                </a>
+                                                <a class="dropdown-item" asp-area="" asp-controller="Login" asp-action="Index">
                                                     <span>Log Out</span> <i class="fa fa-sign-out"></i>
                                                 </a>
                                             </div>
+
                                         </li>
                                     </ul>
+
                                 </div>
                             </div>
+
                         </div>
                     </nav>
                 </div>
-                <!-- End Topbar -->
+
                 <!-- Dashboard Inner -->
                 <div class="midde_cont">
                     <div class="container-fluid">
                         @RenderBody()
                     </div>
 
-                    <!-- Footer -->
                     <div class="container-fluid">
                         <div class="footer">
                             <p>
@@ -171,7 +195,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- End Dashboard Inner -->
+
             </div>
             <!-- End Content -->
         </div>
@@ -181,24 +205,17 @@
     <script src="~/pluto-1.0.0/js/jquery.min.js"></script>
     <script src="~/pluto-1.0.0/js/popper.min.js"></script>
     <script src="~/pluto-1.0.0/js/bootstrap.min.js"></script>
-
-    <!-- wow animation -->
     <script src="~/pluto-1.0.0/js/animate.js"></script>
-    <!-- select bootstrap -->
     <script src="~/pluto-1.0.0/js/bootstrap-select.js"></script>
-    <!-- owl carousel -->
     <script src="~/pluto-1.0.0/js/owl.carousel.js"></script>
-    <!-- chart js -->
     <script src="~/pluto-1.0.0/js/Chart.min.js"></script>
     <script src="~/pluto-1.0.0/js/Chart.bundle.min.js"></script>
     <script src="~/pluto-1.0.0/js/utils.js"></script>
     <script src="~/pluto-1.0.0/js/analyser.js"></script>
-    <!-- nice scrollbar -->
     <script src="~/pluto-1.0.0/js/perfect-scrollbar.min.js"></script>
     <script>
         var ps = new PerfectScrollbar('#sidebar');
     </script>
-    <!-- custom js -->
     <script src="~/pluto-1.0.0/js/custom.js"></script>
     <script src="~/pluto-1.0.0/js/chart_custom_style1.js"></script>
 

@@ -1,45 +1,93 @@
-﻿@model List<ContactMessage>
+﻿@using Blogy.Business.DTOs.ContactDtos
+@model List<ResultContactMessageDto>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Gelen Mesajlar";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Gelen Mesajlar</h2>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Gönderen</th>
-            <th>Email</th>
-            <th>Konu</th>
-            <th>Tarih</th>
-            <th>Yanıtlandı mı?</th>
-            <th>Detay</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var msg in Model)
-        {
-            <tr>
-                <td>@msg.SenderName</td>
-                <td>@msg.SenderEmail</td>
-                <td>@msg.Subject</td>
-                <td>@msg.CreatedDate.ToShortDateString()</td>
-                <td>
-                    @if (msg.IsReplied)
-                    {
-                        <span class="badge bg-success">Yanıtlandı</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Yanıtlanmadı</span>
-                    }
-                </td>
-                <td>
-                    <a href="/Admin/Contact/Detail/@msg.Id" class="btn btn-primary btn-sm">Gör</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <!-- Başlık -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Gelen Mesajlar</h2>
+                </div>
+            </div>
+        </div>
 
+        <!-- İçerik -->
+        <div class="row column1">
+            <div class="col-md-12">
+                <div class="white_shd full margin_bottom_30">
+
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Mesaj Listesi</h3>
+                        </div>
+                    </div>
+
+                    <div class="full padding_infor_info">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Gönderen</th>
+                                        <th>Email</th>
+                                        <th>Konu</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                        <th class="text-center">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (!Model.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center p-4 text-muted">
+                                                Henüz mesaj bulunmuyor.
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        foreach (var msg in Model)
+                                        {
+                                            <tr>
+                                                <td>@msg.SenderName</td>
+                                                <td>@msg.SenderEmail</td>
+                                                <td>@msg.Subject</td>
+                                                <td>@msg.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+
+                                                <td>
+                                                    @if (msg.IsReplied)
+                                                    {
+                                                        <span class="badge bg-success">Yanıtlandı</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning text-dark">Yanıt Bekliyor</span>
+                                                    }
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <a href="/Admin/Contact/Detail/@msg.Id"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        Görüntüle
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

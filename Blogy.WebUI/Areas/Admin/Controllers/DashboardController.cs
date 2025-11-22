@@ -1,5 +1,6 @@
 ﻿using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CategoryServices;
+using Blogy.Business.Services.CommentServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,32 +8,23 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class DashboardController : Controller
+    public class DashboardController(IBlogService _blogService, ICategoryService _categoryService,ICommentService _commentService) : Controller
     {
-        private readonly IBlogService _blogService;
-        private readonly ICategoryService _categoryService;
-
-        public DashboardController(IBlogService blogService, ICategoryService categoryService)
-        {
-            _blogService = blogService;
-            _categoryService = categoryService;
-        }
 
         public async Task<IActionResult> Index()
         {
             var blogs = await _blogService.GetAllAsync();
             var categories = await _categoryService.GetAllAsync();
+            var comments = await _commentService.GetAllAsync();
 
             ViewBag.TotalBlogs = blogs.Count;
             ViewBag.TotalCategories = categories.Count;
             ViewBag.TodayBlogs = blogs.Count(x => x.CreatedDate.Date == DateTime.Now.Date);
+            ViewBag.TotalComments = comments.Count;  // ⭐ Yeni eklenen alan
 
             return View();
         }
 
-        // -------------------------------------------------------
-        // Kategorilere göre blog sayısı (Chart.js için JSON)
-        // -------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> GetBlogsByCategory()
         {
@@ -43,10 +35,6 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
 
             return Json(new { labels, values });
         }
-
-        // -------------------------------------------------------
-        // Son 7 gün blog eklenme grafiği
-        // -------------------------------------------------------
         [HttpGet]
         public async Task<IActionResult> GetBlogsLast7Days()
         {

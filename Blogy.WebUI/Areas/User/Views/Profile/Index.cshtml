@@ -1,25 +1,101 @@
 ﻿@using Blogy.Business.DTOs.UserDtos
 @model EditProfileDto
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Profilim";
     Layout = "~/Views/UILayout/Index.cshtml";
 }
 
-<h2>Profil Ayarları</h2>
+<div class="container" style="margin-top:40px; margin-bottom:40px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-<form method="post" enctype="multipart/form-data">
-    <label>Ad</label>
-    <input asp-for="FirstName" class="form-control" /><br />
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="m-0">Profil Ayarları</h5>
+                </div>
+                <div class="card-body">
 
-    <label>Soyad</label>
-    <input asp-for="LastName" class="form-control" /><br />
+                    <!-- Sekmeler -->
+                    <ul class="nav nav-tabs mb-4" id="profileTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#profileInfo">Kişisel Bilgiler</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#changePassword">Şifre Değiştir</a>
+                        </li>
+                    </ul>
 
-    <label>Email</label>
-    <input asp-for="Email" class="form-control" /><br />
+                    <div class="tab-content">
 
-    <label>Telefon</label>
-    <input asp-for="PhoneNumber" class="form-control" /><br />
+                        <!-- PROFIL BILGILERI -->
+                        <div class="tab-pane fade show active" id="profileInfo">
 
-    <button class="btn btn-primary">Güncelle</button>
-</form>
+                            <form method="post" enctype="multipart/form-data" asp-action="Index">
 
+                                <div class="mb-3">
+                                    <label class="form-label">Ad</label>
+                                    <input asp-for="FirstName" class="form-control" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Soyad</label>
+                                    <input asp-for="LastName" class="form-control" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input asp-for="Email" class="form-control" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Telefon</label>
+                                    <input asp-for="PhoneNumber" class="form-control" />
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Bilgileri Güncelle</button>
+                            </form>
+
+                        </div>
+
+                        <!-- ŞIFRE DEĞIŞTIR -->
+                        <div class="tab-pane fade" id="changePassword">
+
+                            @if (TempData["PasswordError"] != null)
+                            {
+                                <div class="alert alert-danger">@TempData["PasswordError"]</div>
+                            }
+                            @if (TempData["PasswordSuccess"] != null)
+                            {
+                                <div class="alert alert-success">@TempData["PasswordSuccess"]</div>
+                            }
+
+                            <form method="post" asp-action="ChangePassword">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mevcut Şifre</label>
+                                    <input type="password" name="CurrentPassword" class="form-control" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Yeni Şifre</label>
+                                    <input type="password" name="NewPassword" class="form-control" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Yeni Şifre (Tekrar)</label>
+                                    <input type="password" name="ConfirmPassword" class="form-control" required />
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Şifreyi Güncelle</button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

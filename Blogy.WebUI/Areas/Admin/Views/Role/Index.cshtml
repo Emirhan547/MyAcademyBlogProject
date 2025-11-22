@@ -1,33 +1,75 @@
 ﻿@model List<AppRole>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Rol Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>Rol Listesi</h3>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-@{
-    int count = 0;
-}
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Rol Yönetimi</h2>
+                </div>
+            </div>
+        </div>
 
-<table class="table table-bordered table-hover">
-    <tr>
-        <th>#</th>
-        <th>Rol Adı</th>
-        <th>İşlemler</th>
-    </tr>
+        <!-- Liste Kartı -->
+        <div class="row column1">
+            <div class="col-md-12">
+                <div class="white_shd full margin_bottom_30">
 
-    @foreach (var item in Model)
-    {
-        count++;
-        <tr>
-            <th>@count</th>
-            <td>@item.Name</td>
-            <td>
-                <a href="/Admin/Role/DeleteRole/@item.Id" class="btn btn-danger">Sil</a>
-            </td>
-        </tr>
-    }
-</table>
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Rol Listesi</h3>
+                        </div>
+                    </div>
 
-<a href="/Admin/Role/CreateRole" class="btn btn-primary">Yeni Rol Oluştur</a>
+                    <div class="full padding_infor_info">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Rol Adı</th>
+                                        <th class="text-center">İşlem</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @{
+                                        int count = 0;
+                                    }
+
+                                    @foreach (var role in Model)
+                                    {
+                                        count++;
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@role.Name</td>
+                                            <td class="text-center">
+                                                <a href="/Admin/Role/DeleteRole/@role.Id"
+                                                   class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('Bu rolü silmek istediğine emin misin?');">
+                                                    <i class="fa fa-trash"></i> Sil
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <a href="/Admin/Role/CreateRole" class="btn btn-primary mt-3">
+                            <i class="fa fa-plus"></i> Yeni Rol Oluştur
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

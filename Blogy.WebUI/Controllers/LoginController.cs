@@ -50,7 +50,7 @@ namespace Blogy.WebUI.Controllers
             }
 
             // USER İSE
-            return RedirectToAction("Index", "Home", new { area = "User" });
+            return RedirectToAction("Index", "Default");
         }
 
         // ✅ LOGOUT EKLENDİ

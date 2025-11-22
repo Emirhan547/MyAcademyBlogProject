@@ -1,5 +1,5 @@
-﻿@using Blogy.Entity.Entities
-@model ContactMessage
+﻿@using Blogy.Business.DTOs.ContactDtos
+@model GetContactMessageDetailDto
 @{
     Layout = "~/Views/UILayout/Index.cshtml";
 }
@@ -8,10 +8,10 @@
     <div class="container">
         <h2>Mesajınız Alındı</h2>
 
-        <p><strong>Tespit Edilen Dil:</strong> @Model.DetectedLanguage</p>
+        <p><strong>Tespit edilen dil:</strong> @Model.DetectedLanguage</p>
 
         <div class="alert alert-info mt-3">
-            <strong>Otomatik Yanıt:</strong><br />
+            <strong>AI Yanıtı:</strong> <br />
             @Model.AutoReply
         </div>
     </div>

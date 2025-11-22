@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
 using Blogy.Business.DTOs.AiDtos;
 using Blogy.Business.DTOs.BlogDtos;
+using Blogy.Business.DTOs.CategoryDtos;
 using Blogy.Business.Services.AiServices;
 using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CategoryServices;
 using Blogy.Entity.Entities;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PagedList.Core;
+using System.Linq;
 using System.Text.Json;
 
 namespace Blogy.WebUI.Areas.Writer.Controllers
@@ -49,34 +52,27 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var categories = await _categoryService.GetAllAsync();
-
-            var dto = new CreateBlogDto();
-            dto.Categories = categories
-                .Select(c => new SelectListItem
-                {
-                    Text = c.Name,
-                    Value = c.Id.ToString()
-                })
-                .ToList();
+            var dto = new CreateBlogDto
+            {
+                Categories = await GetCategorySelectListAsync()
+            };
 
             return View(dto);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Create(CreateBlogDto dto)
         {
+            dto.Categories = await GetCategorySelectListAsync();
+
+            if (!dto.Categories.Any())
+            {
+
+                ModelState.AddModelError(nameof(dto.CategoryId), "Kayıtlı bir kategori bulunamadı. Lütfen önce kategori ekleyin.");
+            }
+
             if (!ModelState.IsValid)
             {
-                // ModelState bozulduğunda kategorileri tekrar doldurmalısın
-                var categories = await _categoryService.GetAllAsync();
-                dto.Categories = categories.Select(c => new SelectListItem
-                {
-                    Text = c.Name,
-                    Value = c.Id.ToString()
-                }).ToList();
-
                 return View(dto);
             }
 
@@ -86,6 +82,20 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             await _blogService.CreateAsync(dto);
             return RedirectToAction("Index");
         }
+        private async Task<List<SelectListItem>> GetCategorySelectListAsync()
+        {
+            var categories = await _categoryService.GetAllAsync() ?? Enumerable.Empty<ResultCategoryDto>();
+
+            return categories
+                .OrderBy(c => c.Name)
+                .Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                })
+                .ToList();
+        }
+
 
 
         [HttpPost]

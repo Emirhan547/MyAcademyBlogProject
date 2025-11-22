@@ -9,12 +9,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blogy.Business.Extensions
 {
@@ -22,26 +17,39 @@ namespace Blogy.Business.Extensions
     {
         public static void AddServicesExt(this IServiceCollection services)
         {
-
+            // ---------------------------
+            // 🔥 SCRUTOR → Business Servisleri Tara
+            // ---------------------------
             services.Scan(opt =>
             {
                 opt.FromAssemblies(Assembly.GetExecutingAssembly())
-                    .AddClasses(publicOnly: false)
-                    .UsingRegistrationStrategy(registrationStrategy: RegistrationStrategy.Skip)
+                    .AddClasses(classes => classes
+                        .Where(type =>
+                            type.Namespace != null &&
+                            !type.Namespace.Contains("CategoryServices")))  // Category manuel eklenecek
+                    .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                     .AsMatchingInterface()
                     .AsImplementedInterfaces()
                     .WithScopedLifetime();
             });
 
+            // ---------------------------
+            // 🔥 CATEGORY SERVICE → MANUEL BAĞLANIYOR
+            // ---------------------------
+            services.AddScoped<ICategoryService, CategoryService>();
+
+            // ---------------------------
+            // AUTO MAPPER
+            // ---------------------------
             services.AddAutoMapper(typeof(CategoryMappings).Assembly);
 
+            // ---------------------------
+            // FLUENT VALIDATION
+            // ---------------------------
             services
                 .AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters()
                 .AddValidatorsFromAssembly(typeof(CreateCategoryValidator).Assembly);
-
-           
-            
         }
     }
 }

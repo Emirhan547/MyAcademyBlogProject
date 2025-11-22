@@ -5,26 +5,52 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>Yeni About Oluştur</h3>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-<form method="post">
-    <div class="form-group">
-        <label>İçerik</label>
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Yeni About Oluştur</h2>
+                </div>
+            </div>
+        </div>
 
-        <textarea asp-for="Content" id="aboutContent" class="form-control" rows="6"></textarea>
+        <!-- İçerik Kartı -->
+        <div class="white_shd full margin_bottom_30">
+
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h3>About İçeriği</h3>
+                </div>
+            </div>
+
+            <div class="full padding_infor_info">
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">İçerik</label>
+                        <textarea asp-for="Content" id="aboutContent" class="form-control" rows="6"></textarea>
+                    </div>
+
+                    <button type="button" id="aiGenerateBtn" class="btn btn-warning me-2">
+                        <i class="fa fa-robot"></i> AI Önerisi Oluştur
+                    </button>
+
+                    <button class="btn btn-primary">
+                        <i class="fa fa-save"></i> Kaydet
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
-
-    <br />
-
-    <button type="button" id="aiGenerateBtn" class="btn btn-warning">
-        <i class="fa fa-robot"></i> AI Önerisi Oluştur
-    </button>
-
-    <button class="btn btn-primary">Kaydet</button>
-</form>
+</div>
 
 @section Scripts {
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -36,26 +62,15 @@
                 url: "/Admin/About/GenerateAiAbout",
                 type: "POST",
                 success: function (data) {
-
-                    console.log("AI RESPONSE:", data);
-
                     $("#aboutContent").val(data);
-
                     $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
                 },
-                error: function (xhr) {
-
-                    console.log("AJAX ERROR:", xhr);
-
-                    let msg = xhr.responseText ? xhr.responseText : "AI içerik oluşturulamadı!";
-                    alert(msg);
-
+                error: function () {
+                    alert("AI içerik oluşturulamadı!");
                     $("#aiGenerateBtn").prop("disabled", false).text("AI Önerisi Oluştur");
                 }
             });
 
         });
     </script>
-
 }
-

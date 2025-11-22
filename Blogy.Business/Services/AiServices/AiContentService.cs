@@ -97,12 +97,43 @@ JSON dışında asla başka açıklama ekleme."
 
         public async Task<string> GenerateAboutTextAsync()
         {
-            return await GenerateBlogJsonAsync("Blogy", "300 karakterlik about yazısı üret.") ?? "";
+            var client = CreateClient();
+
+            var request = new
+            {
+                model = "gpt-4o-mini",
+                messages = new[]
+                {
+            new
+            {
+                role = "system",
+                content = "Kısa ve akıcı bir 'Hakkımızda' paragrafı yaz. Sadece düz metin üret. JSON, liste, başlık, süslü parantez, etiket, markdown veya başka biçim KULLANMA."
+            },
+            new
+            {
+                role = "user",
+                content = "300 karakterlik sade bir about yazısı üret."
+            }
+        },
+                temperature = 0.4,
+                max_tokens = 300
+            };
+
+            var response = await client.PostAsJsonAsync(
+                "https://api.openai.com/v1/chat/completions", request);
+
+            var json = await response.Content.ReadAsStringAsync();
+            var parsed = JsonDocument.Parse(json);
+
+            var content = parsed.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString();
+
+            return content?.Trim() ?? "";
         }
 
-        // -------------------------------------------------------
-        // LANGUAGE DETECT
-        // -------------------------------------------------------
         public async Task<string> DetectLanguageAsync(string text)
         {
             try
@@ -184,10 +215,6 @@ JSON dışında asla başka açıklama ekleme."
                 return text;
             }
         }
-
-        // -------------------------------------------------------
-        // AUTO REPLY (MESAJ CEVAPLAMA)
-        // -------------------------------------------------------
         public async Task<string> GenerateAutoReplyAsync(string message, string detectedLanguage)
         {
             var client = CreateClient();

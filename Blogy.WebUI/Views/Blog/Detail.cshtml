@@ -140,7 +140,8 @@
                             </div>
                         }
 
-                        @if (User.Identity.IsAuthenticated)
+                        <!-- SADECE USER veya WRITER YORUM YAPABİLİR -->
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("User") || User.IsInRole("Writer")))
                         {
                             <form method="post" asp-action="AddComment" asp-controller="Blog" class="p-5 bg-light">
                                 <input type="hidden" name="BlogId" value="@Model.Id" />
@@ -173,7 +174,7 @@
             <!-- SAĞ SİDEBAR -->
             <div class="col-md-12 col-lg-4 sidebar">
 
-                <!-- Search (İstersek kapatırız) -->
+                <!-- Search -->
                 <div class="sidebar-box search-form-wrap">
                     <form class="sidebar-search-form">
                         <span class="bi-search"></span>

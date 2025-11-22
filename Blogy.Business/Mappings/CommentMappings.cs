@@ -14,8 +14,6 @@ namespace Blogy.Business.Mappings
         public CommentMappings()
         {
             CreateMap<Comment, ResultCommentDto>().ReverseMap();
-            CreateMap<Comment, CreateCommentDto>().ReverseMap();
-            CreateMap<Comment, UpdateCommentDto>().ReverseMap();
         }
     }
 }

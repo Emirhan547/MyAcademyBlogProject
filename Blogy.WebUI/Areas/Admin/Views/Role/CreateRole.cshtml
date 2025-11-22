@@ -1,15 +1,54 @@
 ﻿@model AppRole
 @{
-    ViewData["Title"] = "CreateRole";
+    ViewData["Title"] = "Yeni Rol Oluştur";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>Yeni Rol Oluştur</h3>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-<form method="post">
-    <label>Rol Adı</label>
-    <input type="text" asp-for="Name" class="form-control" required />
-    <br />
-    <span class="text-danger">@Html.ValidationSummary()</span>
-    <button class="btn btn-outline-primary">Kaydet</button>
-</form>
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Yeni Rol Oluştur</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Kartı -->
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="white_shd full margin_bottom_30">
+
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Rol Bilgileri</h3>
+                        </div>
+                    </div>
+
+                    <div class="full padding_infor_info">
+                        <form method="post">
+
+                            <div class="form-group mb-3">
+                                <label>Rol Adı</label>
+                                <input type="text" asp-for="Name" class="form-control" required>
+                            </div>
+
+                            <div class="text-danger mb-2">
+                                @Html.ValidationSummary()
+                            </div>
+
+                            <button class="btn btn-primary px-4">
+                                <i class="fa fa-save"></i> Kaydet
+                            </button>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -17,14 +17,14 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var messages = await _contactService.GetAllMessagesAsync();
-            return View(messages);
+            var list = await _contactService.GetAllMessagesAsync();
+            return View(list); // DTO
         }
 
         public async Task<IActionResult> Detail(int id)
         {
-            var message = await _contactService.GetMessageByIdAsync(id);
-            return View(message);
+            var msg = await _contactService.GetMessageByIdAsync(id);
+            return View(msg); // DTO
         }
     }
 }

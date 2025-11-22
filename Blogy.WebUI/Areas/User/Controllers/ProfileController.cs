@@ -20,6 +20,7 @@ namespace Blogy.WebUI.Areas.User.Controllers
             _mapper = mapper;
         }
 
+        // PROFIL INDEX
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -27,6 +28,7 @@ namespace Blogy.WebUI.Areas.User.Controllers
             return View(dto);
         }
 
+        // PROFIL GÜNCELLEME
         [HttpPost]
         public async Task<IActionResult> Index(EditProfileDto model)
         {
@@ -36,10 +38,34 @@ namespace Blogy.WebUI.Areas.User.Controllers
             user.LastName = model.LastName;
             user.Email = model.Email;
             user.PhoneNumber = model.PhoneNumber;
-            user.Title = model.Title;
 
             await _userManager.UpdateAsync(user);
+            TempData["PasswordSuccess"] = "Profil bilgileriniz güncellendi.";
 
+            return RedirectToAction("Index");
+        }
+
+        // ŞIFRE DEĞİŞTIRME
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(string CurrentPassword, string NewPassword, string ConfirmPassword)
+        {
+            if (NewPassword != ConfirmPassword)
+            {
+                TempData["PasswordError"] = "Yeni şifreler birbiriyle uyuşmuyor.";
+                return RedirectToAction("Index");
+            }
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var result = await _userManager.ChangePasswordAsync(user, CurrentPassword, NewPassword);
+
+            if (!result.Succeeded)
+            {
+                TempData["PasswordError"] = "Mevcut şifre yanlış veya şifre gereksinimleri karşılanmıyor.";
+                return RedirectToAction("Index");
+            }
+
+            TempData["PasswordSuccess"] = "Şifreniz başarıyla güncellendi.";
             return RedirectToAction("Index");
         }
     }

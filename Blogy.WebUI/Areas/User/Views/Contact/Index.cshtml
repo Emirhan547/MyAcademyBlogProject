@@ -1,5 +1,5 @@
-﻿@using Blogy.Entity.Entities
-@model ContactMessage
+﻿@using Blogy.Business.DTOs.ContactDtos
+@model CreateContactMessageDto
 @{
     Layout = "~/Views/UILayout/Index.cshtml";
 }
@@ -12,22 +12,22 @@
 
             <div class="mb-3">
                 <label>Ad Soyad</label>
-                <input asp-for="SenderName" class="form-control" required />
+                <input asp-for="SenderName" class="form-control" />
             </div>
 
             <div class="mb-3">
                 <label>Email</label>
-                <input asp-for="SenderEmail" class="form-control" type="email" required />
+                <input asp-for="SenderEmail" type="email" class="form-control" />
             </div>
 
             <div class="mb-3">
                 <label>Konu</label>
-                <input asp-for="Subject" class="form-control" required />
+                <input asp-for="Subject" class="form-control" />
             </div>
 
             <div class="mb-3">
                 <label>Mesaj</label>
-                <textarea asp-for="Message" class="form-control" rows="5" required></textarea>
+                <textarea asp-for="Message" rows="5" class="form-control"></textarea>
             </div>
 
             <button class="btn btn-primary">Gönder</button>

@@ -1,61 +1,123 @@
 ﻿@model EditProfileDto
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Profil Bilgileri";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>Profil Bilgileri Güncelleme Sayfası</h3>
-<div class="card text-center">
-    <div class="card-title text-secondary">
-        <h4>Profil Resmi</h4>
-    </div>
-    <div class="card-body">
-        <img src="@Model.ImageUrl" style="height:100px;width:100px" alt="Profil Resmi" />
+<div class="midde_cont">
+    <div class="container-fluid">
+
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Profil Bilgileri</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profil Kartı -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="white_shd full margin_bottom_30">
+
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Profil Resmi</h3>
+                        </div>
+                    </div>
+
+                    <div class="full padding_infor_info text-center">
+                        <img src="@Model.ImageUrl" class="rounded-circle"
+                             style="height:120px; width:120px; object-fit:cover; border:3px solid #ddd;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="white_shd full margin_bottom_30">
+
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Profil Bilgilerini Düzenle</h3>
+                        </div>
+                    </div>
+
+                    <div class="full padding_infor_info">
+                        <form method="post" enctype="multipart/form-data">
+
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <div class="form-group mb-3">
+                                        <label>Profil Resmi Seçin</label>
+                                        <input type="file" asp-for="ImageFile" class="form-control">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label>Ad</label>
+                                        <input type="text" asp-for="FirstName" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label>Soyad</label>
+                                        <input type="text" asp-for="LastName" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label>Kullanıcı Adı</label>
+                                        <input type="text" asp-for="UserName" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <div class="form-group mb-3">
+                                        <label>Email</label>
+                                        <input type="email" asp-for="Email" class="form-control" required>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label>Unvan</label>
+                                        <input type="text" asp-for="Title" class="form-control">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label>Telefon Numarası</label>
+                                        <input type="text" asp-for="PhoneNumber" class="form-control">
+                                    </div>
+
+                                    <input type="hidden" asp-for="ImageUrl" />
+                                </div>
+
+                                <div class="col-md-12 mt-4">
+                                    <div class="form-group mb-3">
+                                        <label>Bilgileri güncellemek için mevcut şifrenizi girin</label>
+                                        <input type="password" asp-for="CurrentPassword" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <span class="text-danger">@Html.ValidationSummary()</span>
+                                </div>
+
+                                <div class="col-md-12 text-end mt-3">
+                                    <button class="btn btn-primary px-4">
+                                        <i class="fa fa-save"></i> Bilgileri Güncelle
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
-
-
-<form method="post" enctype="multipart/form-data">
-    <div class="row">
-        <div class="col-6">
-            <label>Profil Resmi Seçin</label>
-            <input type="file" asp-for="ImageFile" class="form-control" />
-            <br />
-            <label>Ad</label>
-            <input type="text" asp-for="FirstName" class="form-control" required />
-            <br />
-            <label>Soyad</label>
-            <input type="text" asp-for="LastName" class="form-control" required />
-            <br />
-            <label>Kullanıcı Adı</label>
-            <input type="text" asp-for="UserName" class="form-control" required />
-            <br />
-
-        </div>
-
-        <div class="col-6">
-            <label>Email</label>
-            <input type="email" asp-for="Email" class="form-control" required />
-            <br />
-            <label>Unvan</label>
-            <input type="text" asp-for="Title" class="form-control" />
-            <br />
-            <label>Telefon Numarası</label>
-            <input type="text" asp-for="PhoneNumber" class="form-control" />
-            <br />
-            <input type="hidden" asp-for="ImageUrl" />
-        </div>
-
-        <div class="col-6">
-            <label>Bilgileri Güncellemek için Mevcut Şifrenizi Girin</label>
-            <input type="password" asp-for="CurrentPassword" class="form-control" required />
-        </div>
-        <br />
-        <span class="text-danger">@Html.ValidationSummary()</span>
-
-        <button class="btn btn-outline-dark">Bilgileri Güncelle</button>
-
-    </div>
-
-
-</form>

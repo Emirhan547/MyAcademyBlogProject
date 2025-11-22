@@ -40,7 +40,7 @@ namespace Blogy.WebUI.Controllers
             }
 
             // ✔ OLUŞAN KULLANICIYA USER ROLÜ EKLE
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "Writer");
 
             // ✔ Register sonrası Login sayfasına dönsün
             return RedirectToAction("Index", "Login");

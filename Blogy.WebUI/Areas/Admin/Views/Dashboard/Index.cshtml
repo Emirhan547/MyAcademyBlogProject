@@ -3,83 +3,110 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="row column_title">
-    <div class="col-md-12">
-        <div class="page_title">
-            <h2>Dashboard</h2>
-        </div>
-    </div>
-</div>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-<!-- İstatistik Kartları -->
-<div class="row column1">
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <i class="fa fa-book yellow_color"></i>
-            </div>
-            <div class="counter_no">
-                <p class="total_no">@ViewBag.TotalBlogs</p>
-                <p class="head_couter">Toplam Blog</p>
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>Dashboard</h2>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <i class="fa fa-list blue1_color"></i>
-            </div>
-            <div class="counter_no">
-                <p class="total_no">@ViewBag.TotalCategories</p>
-                <p class="head_couter">Kategori Sayısı</p>
-            </div>
-        </div>
-    </div>
+        <!-- İstatistik Kartları -->
+        <div class="row column1">
 
-    <div class="col-md-6 col-lg-3">
-        <div class="full counter_section margin_bottom_30">
-            <div class="couter_icon">
-                <i class="fa fa-clock-o green_color"></i>
+            <div class="col-lg-3 col-md-6">
+                <div class="full counter_section margin_bottom_30">
+                    <div class="couter_icon">
+                        <i class="fa fa-book yellow_color"></i>
+                    </div>
+                    <div class="counter_no">
+                        <p class="total_no">@ViewBag.TotalBlogs</p>
+                        <p class="head_couter">Toplam Blog</p>
+                    </div>
+                </div>
             </div>
-            <div class="counter_no">
-                <p class="total_no">@ViewBag.TodayBlogs</p>
-                <p class="head_couter">Bugün Eklenen Blog</p>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Grafikler -->
-<div class="row column2 margin_bottom_30">
-    <div class="col-md-6 col-lg-6">
-        <div class="white_shd full">
-            <div class="full graph_head">
-                <h2>Kategorilere Göre Blog Sayısı</h2>
+            <div class="col-lg-3 col-md-6">
+                <div class="full counter_section margin_bottom_30">
+                    <div class="couter_icon">
+                        <i class="fa fa-list blue1_color"></i>
+                    </div>
+                    <div class="counter_no">
+                        <p class="total_no">@ViewBag.TotalCategories</p>
+                        <p class="head_couter">Kategori Sayısı</p>
+                    </div>
+                </div>
             </div>
-            <div class="full graph_revenue">
-                <canvas id="categoryChart"></canvas>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-6 col-lg-6">
-        <div class="white_shd full">
-            <div class="full graph_head">
-                <h2>Son 7 Gün Blog Grafiği</h2>
+            <div class="col-lg-3 col-md-6">
+                <div class="full counter_section margin_bottom_30">
+                    <div class="couter_icon">
+                        <i class="fa fa-clock-o green_color"></i>
+                    </div>
+                    <div class="counter_no">
+                        <p class="total_no">@ViewBag.TodayBlogs</p>
+                        <p class="head_couter">Bugün Eklenen Blog</p>
+                    </div>
+                </div>
             </div>
-            <div class="full graph_revenue">
-                <canvas id="last7daysChart"></canvas>
+            <div class="col-lg-3 col-md-6">
+                <div class="full counter_section margin_bottom_30">
+                    <div class="couter_icon">
+                        <i class="fa fa-comments red_color"></i>
+                    </div>
+                    <div class="counter_no">
+                        <p class="total_no">@ViewBag.TotalComments</p>
+                        <p class="head_couter">Toplam Yorum</p>
+                    </div>
+                </div>
             </div>
+
         </div>
+
+        <!-- Grafikler -->
+        <div class="row column2 margin_bottom_30">
+
+            <!-- Kategori Grafiği -->
+            <div class="col-lg-6 col-md-12">
+                <div class="white_shd full">
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Kategorilere Göre Blog Sayısı</h3>
+                        </div>
+                    </div>
+                    <div class="full graph_revenue">
+                        <canvas id="categoryChart" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Son 7 Gün Grafiği -->
+            <div class="col-lg-6 col-md-12">
+                <div class="white_shd full">
+                    <div class="full graph_head">
+                        <div class="heading1 margin_0">
+                            <h3>Son 7 Günlük Blog İstatistiği</h3>
+                        </div>
+                    </div>
+                    <div class="full graph_revenue">
+                        <canvas id="last7daysChart" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // -----------------------------
+
         // Kategorilere göre blog sayısı
-        // -----------------------------
         fetch("/Admin/Dashboard/GetBlogsByCategory")
             .then(res => res.json())
             .then(data => {
@@ -89,16 +116,21 @@
                         labels: data.labels,
                         datasets: [{
                             label: "Blog Sayısı",
-                            backgroundColor: "#ffcc00",
+                            backgroundColor: "#f9c22e",
+                            borderRadius: 6,
                             data: data.values
                         }]
+                    },
+                    options: {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
                     }
-                })
+                });
             });
 
-        // -----------------------------
-        // Son 7 gün grafiği
-        // -----------------------------
+        // Son 7 gün blog grafiği
         fetch("/Admin/Dashboard/GetBlogsLast7Days")
             .then(res => res.json())
             .then(data => {
@@ -109,11 +141,22 @@
                         datasets: [{
                             label: "Blog",
                             borderColor: "#007bff",
+                            borderWidth: 2,
+                            tension: 0.4,
                             fill: false,
+                            pointRadius: 4,
+                            pointBackgroundColor: "#007bff",
                             data: data.values
                         }]
+                    },
+                    options: {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
                     }
-                })
+                });
             });
+
     </script>
 }

@@ -5,14 +5,45 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h3>About Güncelle</h3>
+<div class="midde_cont">
+    <div class="container-fluid">
 
-<form method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label>İçerik</label>
-        <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+        <!-- Sayfa Başlığı -->
+        <div class="row column_title">
+            <div class="col-md-12">
+                <div class="page_title">
+                    <h2>About Güncelle</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Kartı -->
+        <div class="white_shd full margin_bottom_30">
+
+            <div class="full graph_head">
+                <div class="heading1 margin_0">
+                    <h3>İçerik Düzenleme</h3>
+                </div>
+            </div>
+
+            <div class="full padding_infor_info">
+
+                <form method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">İçerik</label>
+                        <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary">
+                        <i class="fa fa-save"></i> Güncelle
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
-    <br />
-    <button class="btn btn-primary">Güncelle</button>
-</form>
+</div>

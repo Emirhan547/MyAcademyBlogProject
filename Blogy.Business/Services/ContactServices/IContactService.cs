@@ -1,4 +1,5 @@
-﻿using Blogy.Entity.Entities;
+﻿using Blogy.Business.DTOs.ContactDtos;
+using Blogy.Entity.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace Blogy.Business.Services.ContactServices
 {
     public interface IContactService
     {
-        Task<int> SendMessageAsync(ContactMessage message);
-        Task<List<ContactMessage>> GetAllMessagesAsync();
-        Task<ContactMessage> GetMessageByIdAsync(int id);
+        Task<int> SendMessageAsync(CreateContactMessageDto dto);
+        Task<List<ResultContactMessageDto>> GetAllMessagesAsync();
+        Task<GetContactMessageDetailDto> GetMessageByIdAsync(int id);
     }
 }

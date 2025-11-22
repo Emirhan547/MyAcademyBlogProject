@@ -56,10 +56,6 @@ namespace Blogy.WebUI.Areas.Admin.Controllers
             await _aboutService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
-
-        // --------------------------------------------------
-        //               AI ABOUT GENERATOR
-        // --------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> GenerateAiAbout()
         {
