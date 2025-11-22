@@ -1,71 +1,47 @@
 ﻿using Blogy.Business.Extensions;
+using Blogy.DataAccess.Extensions;
 using Blogy.WebUI.Filters;
-using Blogy.Entity.Entities;
-using Microsoft.AspNetCore.Identity;
-using Blogy.DataAccess.Context;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddUserSecrets<Program>();
 
-// Add services
+// Add services to the container. 
+
+// HttpClientFactory servisini ekleyin
 builder.Services.AddHttpClient();
 
-// Identity (DOĞRU TAM YAPI)
-builder.Services.AddIdentity<AppUser, AppRole>(options =>
+// İsteğe bağlı: Özel HttpClient yapılandırması
+builder.Services.AddHttpClient("ToxicityClient", client =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
-
-// Cookie ayarı
-builder.Services.ConfigureApplicationCookie(config =>
-{
-    config.LoginPath = "/Login/Index";
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("User-Agent", "BlogyApp");
 });
 
-// Business + Repo
+builder.Services.AddHttpClient("AIClient", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60);
+    client.DefaultRequestHeaders.Add("User-Agent", "BlogyApp");
+});
+
 builder.Services.AddServicesExt();
 builder.Services.AddRepositoriesExt(builder.Configuration);
 
-// MVC
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<ValidationExceptionFilter>();
 });
 
+builder.Services.ConfigureApplicationCookie(config =>
+{
+    config.LoginPath = "/Login/Index";
+});
+
 var app = builder.Build();
 
-
-// -------------------------
-// ► ROL SEED FONKSİYONU
-// -------------------------
-async Task CreateDefaultRoles(WebApplication app)
-{
-    using var scope = app.Services.CreateScope();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
-
-    string[] roles = { "Admin", "Writer", "User" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new AppRole { Name = role });
-        }
-    }
-}
-
-
-// -------------------------
-// ► Pipeline
-// -------------------------
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -76,19 +52,14 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// AREA ROUTE
+//https:localhost:7000/Admin/Category/Index
 app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
-);
+            name: "areas",
+            pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+          );
 
-// DEFAULT ROUTE
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Default}/{action=Index}/{id?}"
-);
-
-// ROLLERİ OLUŞTUR
-await CreateDefaultRoles(app);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

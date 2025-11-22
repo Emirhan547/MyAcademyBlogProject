@@ -1,40 +1,48 @@
 ﻿using Blogy.DataAccess.Context;
+using Blogy.DataAccess.Repositories.BlogRepositories;
+using Blogy.DataAccess.Repositories.BlogTagRepositories;
 using Blogy.DataAccess.Repositories.CategoryRepositories;
+using Blogy.DataAccess.Repositories.CommentRepositories;
+using Blogy.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
+using System.Reflection;
 
-public static class ServiceRegistrations
+namespace Blogy.DataAccess.Extensions
 {
-    public static void AddRepositoriesExt(this IServiceCollection services, IConfiguration configuration)
+    public static class ServiceRegistrations
     {
-        // ---------------------------
-        // 🔥 SCRUTOR → TÜM *Repository* sınıflarını tara (Category hariç)
-        // ---------------------------
-        services.Scan(scan => scan
-            .FromAssemblyOf<AppDbContext>()
-            .AddClasses(classes =>
-                classes.Where(type =>
-                    type.Name.EndsWith("Repository") &&
-                    type != typeof(CategoryRepository)))        // Category hariç!
-            .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime()
-        );
 
-        // ---------------------------
-        // 🔥 CATEGORY REPOSITORY → MANUEL EKLE
-        // ---------------------------
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-
-        // ---------------------------
-        // DB CONTEXT
-        // ---------------------------
-        services.AddDbContext<AppDbContext>(options =>
+        public static void AddRepositoriesExt(this IServiceCollection services, IConfiguration configuration)
         {
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-            options.UseLazyLoadingProxies();
-        });
+
+            services.Scan(opt =>
+            {
+                opt.FromAssemblies(Assembly.GetExecutingAssembly())
+                    .AddClasses(publicOnly: false)
+                    .UsingRegistrationStrategy(registrationStrategy: RegistrationStrategy.Skip)
+                    .AsMatchingInterface()
+                    .AsImplementedInterfaces()
+                    .WithScopedLifetime();
+            });
+
+
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseLazyLoadingProxies();
+            });
+
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+                .AddEntityFrameworkStores<AppDbContext>();
+
+
+        }
+
     }
 }

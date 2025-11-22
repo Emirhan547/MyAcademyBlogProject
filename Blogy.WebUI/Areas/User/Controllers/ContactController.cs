@@ -16,12 +16,15 @@ namespace Blogy.WebUI.Areas.User.Controllers
             _contactService = contactService;
         }
 
+        // GET: /User/Contact
         public IActionResult Index()
         {
             return View(new CreateContactMessageDto());
         }
 
+        // POST: /User/Contact
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(CreateContactMessageDto dto)
         {
             if (!ModelState.IsValid)
@@ -31,11 +34,15 @@ namespace Blogy.WebUI.Areas.User.Controllers
             return RedirectToAction("Success", new { id });
         }
 
+        // GET: /User/Contact/Success/5
         public async Task<IActionResult> Success(int id)
         {
             var msg = await _contactService.GetMessageByIdAsync(id);
-            return View(msg); // DTO
-        }
 
+            if (msg == null)
+                return RedirectToAction("Index");
+
+            return View(msg);
+        }
     }
 }

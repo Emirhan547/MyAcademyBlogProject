@@ -1,18 +1,15 @@
-﻿using AutoMapper;
-using Blogy.Business.DTOs.AiDtos;
+﻿using Blogy.Business.DTOs.AiDtos;
 using Blogy.Business.DTOs.BlogDtos;
 using Blogy.Business.DTOs.CategoryDtos;
 using Blogy.Business.Services.AiServices;
 using Blogy.Business.Services.BlogServices;
 using Blogy.Business.Services.CategoryServices;
 using Blogy.Entity.Entities;
-using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PagedList.Core;
-using System.Linq;
 using System.Text.Json;
 
 namespace Blogy.WebUI.Areas.Writer.Controllers
@@ -38,6 +35,7 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             _aiService = aiService;
         }
 
+        // LIST
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -49,7 +47,7 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             return View(pagedBlogs);
         }
 
-
+        // CREATE GET
         public async Task<IActionResult> Create()
         {
             var dto = new CreateBlogDto
@@ -60,6 +58,7 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             return View(dto);
         }
 
+        // CREATE POST
         [HttpPost]
         public async Task<IActionResult> Create(CreateBlogDto dto)
         {
@@ -67,8 +66,8 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
 
             if (!dto.Categories.Any())
             {
-
-                ModelState.AddModelError(nameof(dto.CategoryId), "Kayıtlı bir kategori bulunamadı. Lütfen önce kategori ekleyin.");
+                ModelState.AddModelError(nameof(dto.CategoryId),
+                    "Kayıtlı bir kategori bulunamadı. Lütfen önce kategori ekleyin.");
             }
 
             if (!ModelState.IsValid)
@@ -82,9 +81,69 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
             await _blogService.CreateAsync(dto);
             return RedirectToAction("Index");
         }
+
+        // UPDATE GET
+        public async Task<IActionResult> Update(int id)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var blog = await _blogService.GetByIdAsync(id);
+
+            if (blog == null || blog.WriterId != user.Id)
+                return NotFound();
+
+            var dto = new UpdateBlogDto
+            {
+                Id = blog.Id,
+                Title = blog.Title,
+                Description = blog.Description,
+                CoverImage = blog.CoverImage,
+                BlogImage1 = blog.BlogImage1,
+                BlogImage2 = blog.BlogImage2,
+                CategoryId = blog.CategoryId
+            };
+
+            ViewBag.categories = await GetCategorySelectListAsync();
+            return View(dto);
+        }
+
+        // UPDATE POST
+        [HttpPost]
+        public async Task<IActionResult> Update(UpdateBlogDto dto)
+        {
+            ViewBag.categories = await GetCategorySelectListAsync();
+
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var blog = await _blogService.GetByIdAsync(dto.Id);
+
+            if (blog == null || blog.WriterId != user.Id)
+                return Unauthorized();
+
+            await _blogService.UpdateAsync(dto);
+            return RedirectToAction("Index");
+        }
+
+        // DELETE
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var blog = await _blogService.GetByIdAsync(id);
+
+            if (blog == null || blog.WriterId != user.Id)
+                return Unauthorized();
+
+            await _blogService.DeleteAsync(id);
+            return RedirectToAction("Index");
+        }
+
+        // CATEGORY LIST HELPER
         private async Task<List<SelectListItem>> GetCategorySelectListAsync()
         {
-            var categories = await _categoryService.GetAllAsync() ?? Enumerable.Empty<ResultCategoryDto>();
+            var categories = await _categoryService.GetAllAsync()
+                ?? Enumerable.Empty<ResultCategoryDto>();
 
             return categories
                 .OrderBy(c => c.Name)
@@ -96,8 +155,7 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
                 .ToList();
         }
 
-
-
+        // AI GENERATION
         [HttpPost]
         public async Task<IActionResult> GenerateBlogWithAi(string keywords, string prompt)
         {
@@ -132,6 +190,5 @@ namespace Blogy.WebUI.Areas.Writer.Controllers
                 });
             }
         }
-
     }
 }

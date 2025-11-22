@@ -31,9 +31,8 @@
 
                     <label class="mt-3">Blog Görseli 2</label>
                     <input asp-for="BlogImage2" class="form-control" />
-
-                    <label class="mt-3">Kategori</label>
-                    <select asp-for="CategoryId" asp-items="@ViewBag.categories" class="form-control"></select>
+                    <select asp-for="CategoryId" asp-items="ViewBag.categories" class="form-control"></select>
+                    <span class="text-danger" asp-validation-for="CategoryId"></span>
 
                     <button class="btn btn-primary mt-4">
                         <i class="bi bi-save"></i> Kaydet
